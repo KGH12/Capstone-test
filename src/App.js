@@ -1,13 +1,14 @@
 import { lazy, Suspense, useEffect, useState } from "react";
 import { Button, Navbar, Container, Nav, Row, Col } from 'react-bootstrap';
 import './App.css';
-import bg from './img/bg.png';
-import data from './data.js';
 import { Routes, Route, useNavigate, Outlet } from 'react-router-dom';
 import axios from 'axios'
 import { useQuery } from "react-query";
 import Main from "./pages/Main.js";
 import ItemList from "./pages/ItemList.js";
+import Login from "./pages/Login.js";
+import Join from "./pages/Join.js";
+import Mypage from "./pages/Mypage.js";
 
 const Cart = lazy(() => import('./pages/Cart.js'));
 const Detail = lazy(() => import('./pages/Detail.js'));
@@ -45,8 +46,9 @@ function App() {
           <Nav className="me-auto">
             <Nav.Link onClick={() => { navigate('/about') }}>회사정보</Nav.Link>
             <Nav.Link onClick={() => { navigate('/cart') }}>장바구니</Nav.Link>
-            <Nav.Link onClick={() => { navigate('/cart') }}>로그인</Nav.Link>
-            <Nav.Link onClick={() => { navigate('/cart') }}>마이페이지</Nav.Link>
+            <Nav.Link onClick={() => { navigate('/mypage') }}>마이페이지</Nav.Link>
+            <Nav.Link onClick={() => { navigate('/login') }}>로그인</Nav.Link>
+            <Nav.Link onClick={() => { navigate('/join') }}>회원가입</Nav.Link>
           </Nav>
           <Nav className="ms-auto">
             {user.isLoading && '로딩중'}
@@ -59,10 +61,10 @@ function App() {
       <Navbar bg="dark" data-bs-theme="dark">
         <Container>
           <Nav className="me-auto">
-            <Nav.Link onClick={() => { navigate('/about') }}>브랜드</Nav.Link>
-            <Nav.Link onClick={() => { navigate('/cart') }}>품목별</Nav.Link>
-            <Nav.Link onClick={() => { navigate('/cart') }}>신상품</Nav.Link>
-            <Nav.Link onClick={() => { navigate('/cart') }}>인기상품</Nav.Link>
+            <Nav.Link onClick={() => { navigate('/itemlist') }}>브랜드</Nav.Link>
+            <Nav.Link onClick={() => { navigate('/itemlist') }}>품목별</Nav.Link>
+            <Nav.Link onClick={() => { navigate('/itemlist') }}>신상품</Nav.Link>
+            <Nav.Link onClick={() => { navigate('/itemlist') }}>인기상품</Nav.Link>
             <Nav.Link onClick={() => { navigate('/itemlist') }}>상품목록 확인</Nav.Link>
           </Nav>
         </Container>
@@ -79,7 +81,9 @@ function App() {
           </Route>
           <Route path="itemlist" element={<ItemList />} />
           <Route path="/cart" element={<Cart />} />
-
+          <Route path="/login" element={<Login />} />
+          <Route path="/Join" element={<Join />} />
+          <Route path="/mypage" element={<Mypage />} />
         </Routes>
       </Suspense>
 
