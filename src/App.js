@@ -9,6 +9,7 @@ import ItemList from "./pages/ItemList.js";
 import Login from "./pages/Login.js";
 import Join from "./pages/Join.js";
 import Mypage from "./pages/Mypage.js";
+import About from "./pages/About.js";
 
 const Cart = lazy(() => import('./pages/Cart.js'));
 const Detail = lazy(() => import('./pages/Detail.js'));
@@ -110,14 +111,14 @@ function App() {
   );
 }
 
-function About() {
-  return (
-    <div>
-      <h4>회사 정보 페이지입니다.</h4>
-      <Outlet></Outlet>
-    </div>
-  )
-}
+// function About() {
+//   return (
+//     <div>
+//       <h4>회사 정보 페이지입니다.</h4>
+//       <Outlet></Outlet>
+//     </div>
+//   )
+// }
 
 
 
