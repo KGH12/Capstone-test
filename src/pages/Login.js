@@ -64,7 +64,7 @@ function Login(props) {
   }
 
   let onClickConfirmButton = () => {
-    if(email === User.email && pw === User.pw) {
+    if (email === User.email && pw === User.pw) {
       if (rememberMe) {
         localStorage.setItem('userEmail', email);
         localStorage.setItem('rememberMe', String(rememberMe))
@@ -78,13 +78,48 @@ function Login(props) {
     }
   }
 
-  useEffect(()=>{
-    if(emailValid && pwValid){
+  useEffect(() => {
+    if (emailValid && pwValid) {
       setNotAllow(false);
       return;
     }
     setNotAllow(true);
-  },[emailValid,pwValid])
+  }, [emailValid, pwValid])
+
+
+  // Enter 키 이벤트 리스너를 설정하는 useEffect를 추가합니다.
+  useEffect(() => {
+    const handleKeyPress = (e) => {
+      if (e.key === 'Enter' && !notAllow) {
+        onClickConfirmButton();
+      }
+    };
+
+    // 'email-input' 요소를 가져오기
+    const emailInput = document.getElementById('email-input');
+    // 'password-input' 요소를 가져오기
+    const passwordInput = document.getElementById('password-input');
+
+    // 'email-input' 요소가 존재하면 이벤트 리스너를 추가
+    if (emailInput) {
+      emailInput.addEventListener('keydown', handleKeyPress);
+    }
+
+    // 'password-input' 요소가 존재하면 이벤트 리스너를 추가
+    if (passwordInput) {
+      passwordInput.addEventListener('keydown', handleKeyPress);
+    }
+    // 컴포넌트가 언마운트될 때 이벤트 리스너를 정리
+    return () => {
+      if (emailInput) {
+        emailInput.removeEventListener('keydown', handleKeyPress);
+      }
+      if (passwordInput) {
+        passwordInput.removeEventListener('keydown', handleKeyPress);
+      }
+    };
+  }, [notAllow]);
+
 
   return (
     <Form className='login-ContentWrap'>
@@ -92,6 +127,7 @@ function Login(props) {
         <Form.Label className='login-InputTitle'>아이디(이메일)</Form.Label>
         <div className='login-InputWrap'>
           <Form.Control
+            id="email-input"
             value={email}
             onChange={handleEmail}
             type="email"
@@ -111,6 +147,7 @@ function Login(props) {
         <Form.Label className='login-InputTitle'>비밀번호</Form.Label>
         <div className='login-InputWrap'>
           <Form.Control
+            id="password-input"
             value={pw}
             onChange={handlePw}
             type="password" placeholder="비밀번호를 입력하세요." className='login-Input' />
@@ -125,8 +162,8 @@ function Login(props) {
       </Form.Group>
       <Form.Group className="mb-3 d-flex" controlId="formBasicCheckbox">
         <Form.Check type="checkbox" checked={rememberMe}
-        onChange={handleCheckboxChange}
-        label="아이디 저장" />
+          onChange={handleCheckboxChange}
+          label="아이디 저장" />
       </Form.Group>
       <Button onClick={onClickConfirmButton} disabled={notAllow} variant="primary" className='login-Button'>
         {/* type="submit"  */}
@@ -137,7 +174,7 @@ function Login(props) {
         회원가입
       </Button>
     </Form>
-    
+
   )
 }
 
