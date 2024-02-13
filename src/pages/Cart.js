@@ -11,6 +11,11 @@ function Cart(props) {
     
     return (
         <div>
+                        <br /> <br /> <br />
+            
+            
+                        <h1 style={{ fontSize: '30px', fontWeight: '700' }}>장바구니</h1>
+            
             <Table>
                 <thead>
                     <tr>

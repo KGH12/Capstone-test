@@ -1,7 +1,7 @@
 import { lazy, Suspense, useEffect, useState } from "react";
-import { Button, Navbar, Container, Nav, Row, Col } from 'react-bootstrap';
+import { Button, Navbar, Container, Nav, Row, Col, Form, FormControl } from 'react-bootstrap';
 import './App.css';
-import { Routes, Route, useNavigate, Outlet } from 'react-router-dom';
+import { Routes, Route, useNavigate, Outlet, Link } from 'react-router-dom';
 import axios from 'axios'
 import { useQuery } from "react-query";
 import Main from "./pages/Main.js";
@@ -10,6 +10,10 @@ import Login from "./pages/Login.js";
 import Join from "./pages/Join.js";
 import Mypage from "./pages/Mypage.js";
 import About from "./pages/About.js";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSearch, faCartShopping, faUser, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
+
+
 
 const Cart = lazy(() => import('./pages/Cart.js'));
 const Detail = lazy(() => import('./pages/Detail.js'));
@@ -31,45 +35,95 @@ function App() {
 
   let navigate = useNavigate();
 
-  // 서버에서 유저 정보 가져오기
-  let user = useQuery('user', () => {
-    return axios.get('https://codingapple1.github.io/userdata.json').then((a) => {
-      return a.data
-    })
-  })
+
+
+  let handleSearch = (e) => {
+    // 검색 로직을 추가하기
+    e.preventDefault();
+    console.log('검색 버튼이 클릭되었습니다.');
+  };
 
   return (
     <div className="App" >
 
-      <Navbar bg="light" data-bs-theme="light">
+      <Navbar bg="light" data-bs-theme="light" >
         <Container>
-          <Navbar.Brand href="/">ShoeShop</Navbar.Brand>
+          <Navbar.Brand href="/">HS Mall</Navbar.Brand>
+          <Form className="search-form d-flex flex-grow-1" onSubmit={handleSearch}>
+            <Form.Control
+              type="search"
+              placeholder="검색어를 입력하세요"
+              className="search-input me-2"
+              aria-label="Search"
+            />
+            <Button type="submit" typevariant="outline-success" className="search-button">
+              <FontAwesomeIcon icon={faMagnifyingGlass} />
+            </Button>
+          </Form>
+          <Nav className="ms-auto">
+            {/* <Nav.Link onClick={() => { navigate('/about') }}>회사정보</Nav.Link> */}
+            <Nav.Link onClick={() => { navigate('/cart') }}>
+              <FontAwesomeIcon icon={faCartShopping} />
+            </Nav.Link>
+            <Nav.Link onClick={() => { navigate('/mypage') }}>
+              <FontAwesomeIcon icon={faUser} />
+            </Nav.Link>
+          </Nav>
+
+
+
+        </Container>
+      </Navbar>
+
+      {/* <Navbar bg="dark" data-bs-theme="dark">
+        <Container>
           <Nav className="me-auto">
-            <Nav.Link onClick={() => { navigate('/about') }}>회사정보</Nav.Link>
-            <Nav.Link onClick={() => { navigate('/cart') }}>장바구니</Nav.Link>
-            <Nav.Link onClick={() => { navigate('/mypage') }}>마이페이지</Nav.Link>
-            <Nav.Link onClick={() => { navigate('/login') }}>로그인</Nav.Link>
-            <Nav.Link onClick={() => { navigate('/join') }}>회원가입</Nav.Link>
+            <Nav.Link onClick={() => { navigate('/itemlist') }}>여성</Nav.Link>
+            <Nav.Link onClick={() => { navigate('/itemlist') }}>남성</Nav.Link>
+            <Nav.Link onClick={() => { navigate('/itemlist') }}>키즈</Nav.Link>
+            <Nav.Link onClick={() => { navigate('/itemlist') }}>슈즈</Nav.Link>
           </Nav>
           <Nav className="ms-auto">
-            {user.isLoading && '로딩중'}
-            {user.error && '에러!'}
-            {user.data && user.data.name} 님 환영합니다.
+            <Nav.Link onClick={() => { navigate('/login') }}>로그인</Nav.Link>
+            <Nav.Link onClick={() => { navigate('/join') }}>회원가입</Nav.Link>
           </Nav>
         </Container>
       </Navbar>
 
-      <Navbar bg="dark" data-bs-theme="dark">
+
+      <div style={{ color: 'gray', display: 'flex', alignItems: 'center', margin: '10px 130px' }}>
+        <Link to="/" style={{ color: 'gray', textDecoration: 'none', marginRight: '5px' }}>홈</Link>
+        <span>&gt;</span>
+        <Link to="/detail" style={{ color: 'gray', textDecoration: 'none', margin: '0 5px' }}>여성</Link>
+        <span>&gt;</span>
+        <Link to="/detail" style={{ color: 'gray', textDecoration: 'none', margin: '0 5px' }}>티셔츠</Link>
+      </div> */}
+
+      <Navbar bg="dark" data-bs-theme="dark" >
         <Container>
-          <Nav className="me-auto">
-            <Nav.Link onClick={() => { navigate('/itemlist') }}>브랜드</Nav.Link>
-            <Nav.Link onClick={() => { navigate('/itemlist') }}>품목별</Nav.Link>
-            <Nav.Link onClick={() => { navigate('/itemlist') }}>신상품</Nav.Link>
-            <Nav.Link onClick={() => { navigate('/itemlist') }}>인기상품</Nav.Link>
-            <Nav.Link onClick={() => { navigate('/itemlist') }}>상품목록 확인</Nav.Link>
-          </Nav>
+          <Row className="w-100">
+            <Col xs={8} md={8}>
+              <Nav className="me-auto">
+                <Nav.Link onClick={() => { navigate('/itemlist') }}>여성</Nav.Link>
+                <Nav.Link onClick={() => { navigate('/itemlist') }}>남성</Nav.Link>
+                <Nav.Link onClick={() => { navigate('/itemlist') }}>키즈</Nav.Link>
+                <Nav.Link onClick={() => { navigate('/itemlist') }}>슈즈</Nav.Link>
+              </Nav>
+            </Col>
+            <Col xs={4} md={4} className="d-flex justify-content-end">
+              <Nav className="ms-auto">
+                <Nav.Link onClick={() => { navigate('/login') }} className="text-nowrap">로그인</Nav.Link>
+                <Nav.Link onClick={() => { navigate('/join') }} className="text-nowrap">회원가입</Nav.Link>
+              </Nav>
+            </Col>
+          </Row>
         </Container>
       </Navbar>
+
+      
+
+
+
 
       <Suspense fallback={<div>로딩중.......</div>}>
         <Routes>
