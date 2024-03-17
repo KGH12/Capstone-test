@@ -1,11 +1,7 @@
+import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { Form, Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-
-let User = {
-  email: 'capstone2024@hansung.ac.kr',
-  pw: 'web2024!'
-}
 
 function Login(props) {
 
@@ -21,20 +17,18 @@ function Login(props) {
 
   useEffect(() => {
     let savedUserEmail = localStorage.getItem('userEmail');
-    let savedRememberMe2 = localStorage.getItem('rememberMe');
-    let savedRememberMe = localStorage.getItem('rememberMe') === 'true';
-
-    if (savedUserEmail == null) {
-      localStorage.setItem('userEmail', '')
-    }
-    if (savedRememberMe2 == null) {
-      localStorage.setItem('rememberMe', 'false')
-    }
-
-    if (savedRememberMe) {
+    let savedRememberMe = localStorage.getItem('rememberMe');
+    
+    if (savedRememberMe == null) {  // 첫 접속으로 null 일 경우
+      localStorage.setItem('rememberMe', 'false');
+      localStorage.setItem('userEmail', '');
+    } else if (savedRememberMe === 'true') { // true 일 경우
       setEmail(savedUserEmail || '');
       setRememberMe(savedRememberMe);
+    } else {  // false 일 경우
+      setEmail('');
     }
+
   }, []);
 
   let handleEmail = (e) => {
@@ -64,18 +58,27 @@ function Login(props) {
   }
 
   let onClickConfirmButton = () => {
-    if (email === User.email && pw === User.pw) {
-      if (rememberMe) {
-        localStorage.setItem('userEmail', email);
-        localStorage.setItem('rememberMe', String(rememberMe))
+    axios.get(`http://localhost:8080/customers/${email}/${pw}`)
+    .then(result=>{
+      if (result.data == true) {
+        if (rememberMe == true) {
+          localStorage.setItem('userEmail', email);
+          localStorage.setItem('rememberMe', 'true');
+        } else {
+          // localStorage.removeItem('userEmail');
+          // localStorage.removeItem('rememberMe');
+          localStorage.setItem('userEmail', '');
+          localStorage.setItem('rememberMe', 'false');
+        }
+        alert('로그인 성공' + rememberMe);
+        navigate("/");
       } else {
-        localStorage.removeItem('userEmail');
-        localStorage.removeItem('rememberMe');
+        alert('아이디, 비밀번호를 확인하세요.');
       }
-      alert('로그인 성공');
-    } else {
-      alert('아이디, 비밀번호를 확인하세요.')
-    }
+    })
+    .catch(()=>{
+      console.log('로그인 실패');
+    })
   }
 
   useEffect(() => {

@@ -12,6 +12,7 @@ import Mypage from "./pages/Mypage.js";
 import About from "./pages/About.js";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faCartShopping, faUser, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
+import DeleteCustomer from "./pages/DeleteCustomer.js";
 
 
 
@@ -138,7 +139,9 @@ function App() {
           <Route path="/cart" element={<Cart />} />
           <Route path="/login" element={<Login />} />
           <Route path="/Join" element={<Join />} />
-          <Route path="/mypage" element={<Mypage />} />
+          <Route path="/mypage" element={<Mypage />} >
+            <Route path="deleteCustomer" element={<DeleteCustomer />} />
+          </Route>
         </Routes>
       </Suspense>
 

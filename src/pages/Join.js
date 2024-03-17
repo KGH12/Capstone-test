@@ -1,6 +1,10 @@
+import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { Form, Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+import { debounce } from 'lodash';
+
+
 
 function Join(props) {
 
@@ -12,9 +16,11 @@ function Join(props) {
   let [pwConfirm, setPwConfirm] = useState('');
 
   let [emailValid, setEmailValid] = useState(true);
+  let [emailDupCheck, setEmailDupCheck] = useState(null);
   let [pwValid, setPwValid] = useState(false);
   let [pwConfirmValid, setPwConfirmValid] = useState(false);
   let [notAllow, setNotAllow] = useState(true);
+  
 
   let navigate = useNavigate();
 
@@ -58,7 +64,14 @@ function Join(props) {
   }
 
   let onClickConfirmButton = () => {
-    alert('회원가입 완료')
+    axios.post('http://localhost:8080/customers', {email : email, address : address, name : name, password : pw, phone : phone})
+              .then((result) => {
+                alert('회원가입 완료');
+                navigate("/login")
+              })
+              .catch(() => {
+                console.log('회원가입 실패')
+              })
   }
 
   useEffect(() => {
@@ -76,6 +89,39 @@ function Join(props) {
       setPwConfirmValid(false);
     }
   }, [pw, pwConfirm])
+
+
+
+  // 중복 검사를 수행하는 함수
+  let checkEmailDuplication = async () => {
+    if (email.trim() === '') {
+      setEmailDupCheck(null);
+      return;
+    }
+
+    try {axios.get(`http://localhost:8080/customers/email/${email}`)
+      .then((result) => {
+        setEmailDupCheck(result.data);
+        console.log("회원가입 성공");
+      })
+      .catch(()=>{
+        console.log("회원가입 실패");
+      })
+    } catch { }
+  };
+
+  // debounce를 사용하여 입력이 멈춘 후 검사 수행
+  let debouncedCheckEmailDuplication = debounce(checkEmailDuplication, 500);
+
+  useEffect(() => {
+    debouncedCheckEmailDuplication();
+
+    // 컴포넌트가 언마운트될 때 debounce 취소
+    return () => {
+      debouncedCheckEmailDuplication.cancel();
+    };
+  }, [email]); // email 상태가 변경될 때마다 실행
+
 
   return (
     <Form className='login-ContentWrap'>
@@ -131,9 +177,14 @@ function Join(props) {
         </div>
         <Form.Text className="login-ErrorMessageWrap">
           {
-            !emailValid && email.length > 0 && (
-              <div>이메일을 올바르게 입력해주세요.</div>
-            )
+            email.length == 0 ? null : 
+            (!emailValid ? <div>이메일을 올바르게 입력해주세요.</div> :
+            emailDupCheck ? <div>사용 중인 이메일입니다.</div> : 
+             <div style={{color:'green'}}>사용 가능한 이메일입니다.</div>)
+             // email 중복되면 true
+            //  false ? <div>사용 중인 이메일입니다.</div> :             
+            //  @@@@@@@@@@@@@@@ 이메일 중복체크 넣을것 @@@@@@@@@@@@@@@
+            // emailDupCheck ? <div>사용 중인 이메일입니다.</div> : 
           }
         </Form.Text>
       </Form.Group>
