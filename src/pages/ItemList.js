@@ -11,10 +11,9 @@ import { setShoes } from './../store.js'
 import { Link } from 'react-router-dom';
 import Breadcrumb from 'react-bootstrap/Breadcrumb';
 import CardItem from "./CardItem.js";
-
 import productData from './../data/productData.json'
-
-
+import "firebase/firestore"; 
+import { storage } from "../firebaseConfig.js";
 
 // function Pagination({ currentPage, totalPages }) {
 //   const pages = Array.from({ length: totalPages }, (_, index) => index + 1);

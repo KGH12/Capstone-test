@@ -1,9 +1,16 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { Form, Button } from 'react-bootstrap';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { login } from '../store/userSlice';
+import { setCartItems } from '../store/cartSlice';
 
 function Login(props) {
+
+  let dispatch = useDispatch();
+  let { userInfo, isLoggedIn } = useSelector((state) => state.user);
+  let cartItems = useSelector((state) => state.cart.items);
 
   let [email, setEmail] = useState('');
   let [pw, setPw] = useState('');
@@ -18,7 +25,7 @@ function Login(props) {
   useEffect(() => {
     let savedUserEmail = localStorage.getItem('userEmail');
     let savedRememberMe = localStorage.getItem('rememberMe');
-    
+
     if (savedRememberMe == null) {  // 첫 접속으로 null 일 경우
       localStorage.setItem('rememberMe', 'false');
       localStorage.setItem('userEmail', '');
@@ -59,26 +66,40 @@ function Login(props) {
 
   let onClickConfirmButton = () => {
     axios.get(`http://localhost:8080/customers/${email}/${pw}`)
-    .then(result=>{
-      if (result.data == true) {
-        if (rememberMe == true) {
-          localStorage.setItem('userEmail', email);
-          localStorage.setItem('rememberMe', 'true');
+      .then((result) => {
+        if (result.data == true) {
+          if (rememberMe == true) {
+            localStorage.setItem('userEmail', email);
+            localStorage.setItem('rememberMe', 'true');
+          } else {
+            // localStorage.removeItem('userEmail');
+            // localStorage.removeItem('rememberMe');
+            localStorage.setItem('userEmail', '');
+            localStorage.setItem('rememberMe', 'false');
+          }
+
+          dispatch(login({ 'email_id': email }));
+
+          // 장바구니 데이터 가져오기
+          axios.get(`http://localhost:8080/cart/${email}`)
+            .then(result => {
+              dispatch(setCartItems(result.data));
+            })
+            .catch(error => {
+              console.log('장바구니 데이터 불러오기 실패', error);
+            })
+
+          alert('로그인 성공');
+
+          navigate("/");
         } else {
-          // localStorage.removeItem('userEmail');
-          // localStorage.removeItem('rememberMe');
-          localStorage.setItem('userEmail', '');
-          localStorage.setItem('rememberMe', 'false');
+          alert('비밀번호를 확인하세요.');
         }
-        alert('로그인 성공' + rememberMe);
-        navigate("/");
-      } else {
-        alert('아이디, 비밀번호를 확인하세요.');
-      }
-    })
-    .catch(()=>{
-      console.log('로그인 실패');
-    })
+      })
+      .catch(() => {
+        console.log('로그인 실패');
+        alert('아이디를 확인하세요.');
+      })
   }
 
   useEffect(() => {
