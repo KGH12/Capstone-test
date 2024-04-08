@@ -1,52 +1,21 @@
-import Table from 'react-bootstrap/Table';
 import { useDispatch, useSelector } from 'react-redux';
-import { addCount, deleteItem } from '../store.js';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { addToCart, removeFromCart, setCartItems, updateItemQuantity } from '../store/cartSlice.js';
+import { removeFromCart, setCartItems, updateItemQuantity } from '../store/cartSlice.js';
 import { Hidden } from 'react-grid-system';
-import { Button } from 'react-bootstrap';
 import styled from 'styled-components';
 import { Dropdown } from 'react-bootstrap';
 import { FaCheck } from "react-icons/fa";
-
 
 const CheckboxContainer = styled.div`
   display: inline-block;
   vertical-align: middle;
 `;
 
-// const Icon = styled(FaCheck)`
-//   position: absolute;
-//   top: 0;
-//   left: 0;
-//   width: 20px;
-//   height: 20px;
-//   color: #fff;
-// `;
-// const Icon = styled(FaCheck)`
-//   position: absolute;
-//   top: 0;
-//   left: 0;
-//   width: 20px;
-//   height: 20px;
-//   color: ${props => props.checked ? '#fff' : '#ccc'}; // 눌렀을 때 흰 체크, 안 눌렀을 때 회색 체크
-//   visibility: visible; // 항상 보이도록 변경
-// `;
-// const Icon = styled(FaCheck)`
-//   position: absolute;
-//   top: 50%; // 상단에서 50% 위치
-//   left: 50%; // 좌측에서 50% 위치
-//   width: 20px; // 아이콘의 너비를 16px로 조정
-//   height: 20px; // 아이콘의 높이를 16px로 조정
-//   color: ${props => props.checked ? '#fff' : '#ccc'};
-// //   visibility: ${props => props.checked ? 'visible' : 'hidden'};
-//   transform: translate(-50%, -50%); // 아이콘을 정확히 중앙으로 이동
-// `;
 const Icon = styled(FaCheck)`
   position: absolute;
   top: 50%;
@@ -70,38 +39,6 @@ const HiddenCheckbox = styled.input.attrs({ type: 'checkbox' })`
   width: 1px;
 `;
 
-// const StyledCheckbox = styled.div`
-//   display: inline-block;
-//   width: 20px;
-//   height: 20px;
-//   background: ${(props) => (props.checked ? '#007bff' : 'transparent')};
-//   border-radius: 3px;
-//   transition: all 150ms;
-//   border: 2px solid #007bff;
-//   position: relative;
-
-//   ${HiddenCheckbox}:focus + & {
-//     box-shadow: 0 0 0 3px pink;
-//   }
-
-//   ${Icon} {
-//     visibility: ${(props) => (props.checked ? 'visible' : 'hidden')};
-//   }
-// `;
-// const StyledCheckbox = styled.div`
-//   display: inline-block;
-//   width: 20px;
-//   height: 20px;
-//   background: ${props => props.checked ? '#000' : '#fff'}; // 눌렀을 때 검은 배경, 안 눌렀을 때 흰 배경
-//   border-radius: 3px;
-//   transition: all 150ms;
-//   border: 2px solid ${props => props.checked ? '#000' : '#ccc'}; // 눌렀을 때 검은색 테두리, 안 눌렀을 때 회색 테두리
-//   position: relative;
-
-//   ${HiddenCheckbox}:focus + & {
-//     box-shadow: 0 0 0 3px pink;
-//   }
-// `;
 const StyledCheckbox = styled.div`
   display: inline-block;
   width: 24px; // 아이콘 크기에 맞추어 조정
@@ -192,24 +129,10 @@ function CartItem(props) {
 
     let dispatch = useDispatch();
     let { userInfo, isLoggedIn } = useSelector((state) => state.user);
-    let cartItems = useSelector((state) => state.cart.items);
 
     return (
         <div>
             <Row>
-                {/* <Col xs={1} md={{ span: 1, offset: 1 }}>
-                    <input
-                        type="checkbox"
-                        checked={props.isChecked}
-                        onChange={(e) => props.onCheckboxChange(props.item.detailId, e.target.checked)}
-                    />
-                </Col> */}
-                {/* <Col xs={1} md={{ span: 1, offset: 1 }}>
-                    <CustomCheckbox
-                        checked={props.isChecked}
-                        onChange={(e) => props.onCheckboxChange(props.item.detailId, e.target.checked)}
-                    />
-                </Col> */}
                 <Col xs={1} md={{ span: 1, offset: 1 }}>
                     <CustomCheckbox
                         checked={props.isChecked}
@@ -218,7 +141,9 @@ function CartItem(props) {
                 </Col>
 
                 <Col xs={4} md={2}>
-                    <img src={props.item.imageUrl} alt={props.item.name} />
+                <img style={{width:'100px', height:'132px'}} src='https://img.ssfshop.com/cmd/LB_750x1000/src/https://img.ssfshop.com/goods/IMIM/24/03/06/GM0024030654386_0_THNAIL_ORGINL_20240312205132208.jpg' alt={props.item.name} />
+                    {/* <img src={props.item.imageUrl} alt={props.item.name} /> @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ */}
+                    {/* <img style={{width:'100px', height:'132px'}} src={props.item.} alt={props.item.name} /> */}
                 </Col>
                 <Col xs={7} md={4}>
                     <div>
@@ -228,7 +153,6 @@ function CartItem(props) {
                     </div>
                 </Col>
                 <Col xs={5} md={1} style={{ marginTop: '12px' }}>
-                    {/* <span>{props.item.quantity}개</span> */}
                     <Dropdown onSelect={(eventKey) => {
                         const newQuantity = parseInt(eventKey, 10);
                         axios.put(`http://localhost:8080/cart/${userInfo.email_id}/${props.item.detailId}`, { quantity: newQuantity })
@@ -279,10 +203,6 @@ function CartItem(props) {
 }
 
 function Cart(props) {
-
-    // Redux
-    // let state = useSelector((state) => { return state })
-    // let cartList = state.cartList
 
     let navigate = useNavigate();
 

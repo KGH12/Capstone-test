@@ -17,12 +17,8 @@ function Mypage(props) {
   let dispatch = useDispatch()
   let navigate = useNavigate();
   let { userInfo, isLoggedIn } = useSelector((state) => state.user);
+  let [currentPage, setCurrentPage] = useState('마이페이지');
 
-
-
-  const alertClicked = () => {
-    alert('You clicked the third ListGroupItem');
-  };
 
   // 로그인하지 않은 상태라면 로그인 페이지로 리디렉션
   useEffect(() => {
@@ -31,7 +27,7 @@ function Mypage(props) {
       alert('로그인 후 이용해주세요.')
       navigate('/login');
     }
-  }, [isLoggedIn]);
+  });
 
   return (
     <div>
@@ -41,7 +37,7 @@ function Mypage(props) {
 
       <Container>
         <Row>
-          <Col><h1 style={{ fontSize: '30px', fontWeight: '700' }}>마이페이지</h1>
+          <Col><h1 style={{ fontSize: '30px', fontWeight: '700' }}>{currentPage}</h1>
             <br /><br /></Col>
         </Row>
         <Row>
@@ -57,14 +53,25 @@ function Mypage(props) {
                     <td>회원 탈퇴</td>
                   </tr>
                 </table> */}
-            <ListGroup defaultActiveKey="#link1">
-              <ListGroup.Item action href="#link1">
+            <ListGroup >
+            {/* defaultActiveKey="#link1" */}
+              <ListGroup.Item action onClick={() => {
+                navigate('/Mypage/orderDeliveryStatus')
+                setCurrentPage('주문/배송 조회')
+              }}
+                href="#link1">
                 주문/배송 조회
               </ListGroup.Item>
-              <ListGroup.Item action onClick={()=>{ navigate('/mypage/updateCustomer') }}>
+              <ListGroup.Item action onClick={() => {
+                navigate('/mypage/updateCustomer')
+                setCurrentPage('회원정보 수정')
+              }}>
                 회원정보 수정
               </ListGroup.Item>
-              <ListGroup.Item action onClick={() => { navigate('/mypage/deleteCustomer') }} style={{ color: 'red' }}>
+              <ListGroup.Item action onClick={() => {
+                navigate('/mypage/deleteCustomer')
+                setCurrentPage('회원 탈퇴')
+              }} style={{ color: 'red' }}>
                 회원 탈퇴
               </ListGroup.Item>
             </ListGroup>

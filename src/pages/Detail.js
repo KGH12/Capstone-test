@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import Nav from 'react-bootstrap/Nav';
 import { useDispatch, useSelector } from 'react-redux';
 import { addToCart } from '../store/cartSlice';
-// import { addItem } from '../store.js';
 
 function Detail(props) {
 

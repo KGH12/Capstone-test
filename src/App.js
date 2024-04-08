@@ -21,6 +21,9 @@ import { FaShoppingCart } from 'react-icons/fa';
 import { BsCart2 } from "react-icons/bs";
 import { FaUser } from "react-icons/fa";
 import styled from 'styled-components';
+import ProductEdit from "./pages/ProductEdit.js";
+import UpdateCustomer from "./pages/UpdateCustomer.js";
+import PwConfirm from "./pages/PwConfirm.js";
 
 
 
@@ -218,9 +221,11 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/Join" element={<Join />} />
           <Route path="/ProductRegistration" element={<ProductRegistration />} />
+          <Route path="/ProductEdit" element={<ProductEdit />} />
           <Route path="/mypage" element={<Mypage />} >
             <Route path="deleteCustomer" element={<DeleteCustomer />} />
-            {/* <Route path="updateCustomer" element={<UpdateCustomer />} /> */}
+            <Route path="updateCustomer" element={<UpdateCustomer />} />
+            <Route path="PwConfirm" element={<PwConfirm />} />
           </Route>
         </Routes>
       </Suspense>

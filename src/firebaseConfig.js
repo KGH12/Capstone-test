@@ -1,5 +1,6 @@
 import { initializeApp } from 'firebase/app';
-import { getStorage } from 'firebase/storage';
+// import { getStorage } from 'firebase/storage';
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 const firebaseConfig = {
     apiKey: "AIzaSyAbEPvoOioqXqzboqAXF4rt9tOIIpf3240",
@@ -16,4 +17,4 @@ const app = initializeApp(firebaseConfig);
 // Storage 서비스 접근
 const storage = getStorage(app);
 
-export { storage }
+export { storage };
