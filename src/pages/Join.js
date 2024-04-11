@@ -149,7 +149,7 @@ function Join(props) {
   }
 
   let onClickConfirmButton = () => {
-    axios.post('http://localhost:8080/customers', { email: email, address: address + ' ' + fullAddress, name: name, password: pw, phone: phone1 + '-' + phone2 + '-' + phone3 })
+    axios.post(`${process.env.REACT_APP_API_URL}/customers`, { email: email, address: address + ' ' + fullAddress, name: name, password: pw, phone: phone1 + '-' + phone2 + '-' + phone3 })
       .then((result) => {
         alert('회원가입 완료');
         navigate("/login")
@@ -185,7 +185,7 @@ function Join(props) {
     }
 
     try {
-      axios.get(`http://localhost:8080/customers/email/${email}`)
+      axios.get(`${process.env.REACT_APP_API_URL}/customers/email/${email}`)
         .then((result) => {
           setEmailDupCheck(result.data);
         })

@@ -33,12 +33,11 @@ function ProductRegistration() {
         detail: '',
         price: 0,
         genderCategory: 0,
-        categoryNumber: '',
+        // categoryNumber: '',
+        majorCategoryId: '',
+        subCategoryId: '',
         sellerEmail: ''
     });
-
-    const [largeCategory, setLargeCategory] = useState('');
-    const [smallCategory, setSmallCategory] = useState('');
 
     const [productDetails, setProductDetails] = useState([{
         color: '',
@@ -47,19 +46,32 @@ function ProductRegistration() {
         clothesId: 0
     }]);
 
-    // 가정: 대분류 카테고리 데이터
-    const largeCategories = [
-        { id: '01', name: '아우터' },
-        { id: '02', name: '정장' },
-        { id: '03', name: '팬츠' },
-    ];
+    const [majorCategories, setMajorCategories] = useState([]);
+    const [subCategories, setSubCategories] = useState([]);
 
-    // 가정: 소분류 카테고리 데이터 (실제로는 largeCategory에 따라 필터링 필요)
-    const smallCategories = {
-        '01': [{ id: '01', name: '점퍼' }, { id: '02', name: '코트' }],
-        '02': [{ id: '01', name: '정장재킷' }, { id: '02', name: '정장팬츠' }],
-        '03': [{ id: '01', name: '치노' }, { id: '02', name: '슬랙스' }],
-    };
+    // 대분류 카테고리 데이터를 서버에서 가져오기
+    useEffect(() => {
+        axios.get(`${process.env.REACT_APP_API_URL}/major_category`)
+            .then(response => {
+                setMajorCategories(response.data);
+            })
+            .catch(error => {
+                console.error('Major categories fetching error:', error);
+            });
+    }, []);
+
+    // 대분류 카테고리 선택 시 소분류 카테고리 데이터 가져오기
+    useEffect(() => {
+        if (category.majorCategoryId) {
+            axios.get(`${process.env.REACT_APP_API_URL}/sub_category/major_category/${category.majorCategoryId}`)
+                .then(response => {
+                    setSubCategories(response.data);
+                })
+                .catch(error => {
+                    console.error('Sub categories fetching error:', error);
+                });
+        }
+    }, [category.majorCategoryId]);
 
 
 
@@ -72,14 +84,20 @@ function ProductRegistration() {
     };
 
     // 대분류 변경 이벤트 핸들러
-    const handleLargeCategoryChange = (e) => {
-        setLargeCategory(e.target.value);
-        setSmallCategory(''); // 대분류가 변경될 때 소분류 초기화
+    const handleMajorCategoryChange = (e) => {
+        setCategory(prevState => ({
+            ...prevState,
+            majorCategoryId: e.target.value,
+            subCategoryId: '', // 대분류가 변경될 때 소분류 초기화
+        }));
     };
 
     // 소분류 변경 이벤트 핸들러
-    const handleSmallCategoryChange = (e) => {
-        setSmallCategory(e.target.value);
+    const handleSubCategoryChange = (e) => {
+        setCategory(prevState => ({
+            ...prevState,
+            subCategoryId: e.target.value,
+        }));
     };
 
     const handleProductDetailChange = (e, index) => {
@@ -104,7 +122,7 @@ function ProductRegistration() {
 
     const handleUploadImages = async (files) => {
         // FileList 객체를 배열로 변환
-        const filesArray = Array.from(files);
+        const filesArray = files instanceof FileList ? Array.from(files) : [files];
 
         const uploadPromises = filesArray.map((file, index) => {
             const now = new Date();
@@ -125,17 +143,28 @@ function ProductRegistration() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const files = document.querySelector('#image').files;
-        if (files.length === 0) {
-            alert('이미지 파일을 선택해 주세요.');
+        // 썸네일 이미지 파일
+        const thumbnailFile = document.querySelector('#thumbnailImage').files[0];
+        // 추가 이미지 파일들
+        const additionalFiles = document.querySelector('#additionalImages').files;
+
+        if (!thumbnailFile) {
+            alert('썸네일 이미지 파일을 선택해 주세요.');
             return;
         }
+        if (additionalFiles.length === 0) {
+            alert('상품 이미지 파일을 선택해 주세요.');
+            return;
+        }
+
         try {
             // 이미지 업로드 및 URL들을 얻음
-            const imageUrls = await handleUploadImages(files);
+            const [thumbnailImageUrl] = await handleUploadImages(thumbnailFile);
+
+            const additionalImageUrls = additionalFiles.length > 0 ? await handleUploadImages(additionalFiles) : [];
 
             // Category 정보를 서버로 전송하고 응답을 받음
-            const categoryResponse = await axios.post('http://localhost:8080/clothes', category);
+            const categoryResponse = await axios.post(`${process.env.REACT_APP_API_URL}/clothes`, category);
             console.log('Category Response:', categoryResponse.data);
 
             // 상품의 category 등록에 성공한 후, 각 detail 등록
@@ -144,7 +173,7 @@ function ProductRegistration() {
                 // detail.imageUrl = imageUrls.shift(); // 가정: 각 detail마다 이미지 URL이 1개씩 할당됨
 
                 // 서버에 detail 정보 등록
-                const detailResponse = await axios.post('http://localhost:8080/detail', {
+                const detailResponse = await axios.post(`${process.env.REACT_APP_API_URL}/detail`, {
                     ...detail,
                     clothesId: categoryResponse.data.clothesId // 서버로부터 받은 clothesId 사용
                 });
@@ -152,164 +181,36 @@ function ProductRegistration() {
                 console.log('Detail Response:', detailResponse.data);
             }
 
-            // 이미지 URL들을 서버로 POST 요청
-            await Promise.all(imageUrls.map((imageUrl, index) => {
-                return axios.post('http://localhost:8080/clothes_images', {
+            // 이미지 URL들을 서버로 POST 요청. 첫 번째 이미지는 썸네일로, 나머지는 추가 이미지로 처리
+            await axios.post(`${process.env.REACT_APP_API_URL}/clothes_images`, {
+                clothesId: categoryResponse.data.clothesId,
+                imageUrl: thumbnailImageUrl, // 첫 번째 이미지 URL
+                order: 1 // 썸네일 이미지로 설정
+            });
+
+            // 나머지 이미지들 처리
+            await Promise.all(additionalImageUrls.map((imageUrl, index) => {
+                return axios.post(`${process.env.REACT_APP_API_URL}/clothes_images`, {
                     clothesId: categoryResponse.data.clothesId,
                     imageUrl: imageUrl,
-                    order: index + 1 // 이미지 순서 지정 (1부터 시작)
+                    order: index + 2 // 추가 이미지들에 대해 순서 설정 (2부터 시작)
                 });
             }));
 
             alert('상품 등록에 성공했습니다.');
+     
         } catch (error) {
             console.error('Submitting error:', error);
             alert('상품 등록에 실패했습니다.');
         }
 
-        // // 파일 업로드 함수 호출
-        // handleUploadImages(files);
-
-        // axios.put('http://localhost:8080/clothes', category)
-        //   .then(categoryResult => {
-        //     console.log('Category Response:', categoryResult.data);
-
-        //     setProductDetail(prevState => ({
-        //       ...prevState,
-        //       clothesId: categoryResult.data.clothesId // categoryResult.data.clothesId를 적절한 값으로 교체
-        //     }));
-
-
-
-
-        //     axios.put('http://localhost:8080/detail', productDetail)
-        //       .then(detailResult => {
-        //         console.log('Detail Response:', detailResult.data);
-
-        //         try {
-        //           let upload = firebasePath.put(file);
-        //           let imageUrl = upload.ref.getDownloadURL(); // 업로드된 파일의 URL을 가져옵니다.
-
-        //           // 이미지 URL을 상태에 저장하거나 서버로 전송하는 로직 추가
-        //           // console.log(imageUrl); // 처리 예: 이미지 URL 출력
-        //           axios.post('http://localhost:8080/clothes_images', { clothesId: productDetail.clothesId, imageUrl: imageUrl, order: 1 })
-        //             .then(result => {
-        //               console.log('이미지 업로드 성공');
-        //             })
-        //             .catch(error => {
-        //               console.log('이미지 DB 업로드 실패', error);
-        //             })
-
-        //         } catch (error) {
-        //           console.error('이미지 업로드 중 오류 발생:', error);
-        //           alert('이미지 업로드에 실패했습니다.');
-        //         }
-        //       })
-        //       .catch(error => {
-        //         console.error('Submitting error:', error);
-        //         alert('상품 등록에 실패했습니다.');
-        //       })
-        //   })
-        //   .catch(error => {
-        //     console.error('Submitting error:', error);
-        //     alert('상품 등록에 실패했습니다.');
-        //   })
-
-
-
-
-        // // 이미지 파일 처리
-        // let file = document.querySelector('#image').files[0];
-        // if (!file) {
-        //   alert('이미지 파일을 선택해 주세요.');
-        //   return;
-        // }
-
-        // // 파일 이름에 현재 날짜와 시간을 포함시켜 고유하게 만듭니다.
-        // const now = new Date();
-        // const timestamp = now.getTime(); // 현재 시간을 밀리초로
-        // const fileName = `${timestamp}-${file.name}`; // 파일 이름 생성
-
-        // let storageRef = storage.ref();
-        // let firebasePath = storageRef.child(`images/${fileName}`);
-
-        // axios.post('http://localhost:8080/clothes', category)
-        //   .then(categoryResult => {
-        //     console.log('Category Response:', categoryResult.data);
-
-        //     setProductDetail(prevState => ({
-        //       ...prevState,
-        //       clothesId: categoryResult.data.clothesId // categoryResult.data.clothesId를 적절한 값으로 교체
-        //     }));
-
-
-
-        //     axios.post('http://localhost:8080/detail', productDetail)
-        //       .then(detailResult => {
-        //         console.log('Detail Response:', detailResult.data);
-
-        //         try {
-        //           let upload = firebasePath.put(file);
-        //           let imageUrl = upload.ref.getDownloadURL(); // 업로드된 파일의 URL을 가져옵니다.
-
-        //           // 이미지 URL을 상태에 저장하거나 서버로 전송하는 로직 추가
-        //           // console.log(imageUrl); // 처리 예: 이미지 URL 출력
-        //           axios.post('http://localhost:8080/clothes_images', { clothesId: productDetail.clothesId, imageUrl: imageUrl, order: 1 })
-        //             .then(result => {
-        //               console.log('이미지 업로드 성공');
-        //             })
-        //             .catch(error => {
-        //               console.log('이미지 DB 업로드 실패', error);
-        //             })
-
-        //         } catch (error) {
-        //           console.error('이미지 업로드 중 오류 발생:', error);
-        //           alert('이미지 업로드에 실패했습니다.');
-        //         }
-        //       })
-        //       .catch(error => {
-        //         console.error('Submitting error:', error);
-        //         alert('상품 등록에 실패했습니다.');
-        //       })
-        //   })
-        //   .catch(error => {
-        //     console.error('Submitting error:', error);
-        //     alert('상품 등록에 실패했습니다.');
-        //   })
-
     };
-
-    // let file = document.querySelector('#image').files[0];
-    // let storageRef = storage.ref();
-    // let 저장할경로 = storageRef.child('image/' + '파일명');
-    // let 업로드작업 = 저장할경로.put(file)
-
-    // const now = new Date();
-
-    // const year = now.getFullYear();
-    // const month = (now.getMonth() + 1).toString().padStart(2, '0');
-    // const day = now.getDate().toString().padStart(2, '0');
-    // const hours = now.getHours().toString().padStart(2, '0');
-    // const minutes = now.getMinutes().toString().padStart(2, '0');
-
-    // const dateTime = `${year}${month}${day}${hours}${minutes}`;
-
-
-    // largeCategory나 smallCategory가 변경될 때마다 실행
-    useEffect(() => {
-        if (largeCategory && smallCategory) {
-            // largeCategory와 smallCategory를 결합하여 categoryNumber 계산
-            const categoryNumber = (parseInt(largeCategory) * 100 + parseInt(smallCategory)).toString();
-            setCategory(prev => ({ ...prev, categoryNumber }));
-        }
-    }, [largeCategory, smallCategory]);
-
 
     return (
 
         <form onSubmit={handleSubmit}>
             <br />
-            <h1>상품 신규 등록</h1>
+            <h1 style={{ fontSize: '30px', fontWeight: '700', marginBottom:'30px' }}>상품 신규 등록</h1>
 
 
 
@@ -342,15 +243,6 @@ function ProductRegistration() {
                     </Form.Group>
                 </Row>
 
-                {/* 성별 카테고리 */}
-                {/* <Row className="mb-3">
-          <Form.Group as={Row} controlId="formGenderCategory">
-            <Form.Label column sm="2">성별 카테고리</Form.Label>
-            <Col sm="10">
-              <Form.Control type="number" name="genderCategory" value={category.genderCategory} onChange={handleCategoryChange} />
-            </Col>
-          </Form.Group>
-        </Row> */}
                 <Row className="mb-3">
                     <Form.Group as={Row} controlId="formGenderCategory">
                         <Form.Label column sm="2">성별 카테고리</Form.Label>
@@ -372,14 +264,14 @@ function ProductRegistration() {
 
                 {/* 대분류 선택 */}
                 <Row className="mb-3">
-                    <Form.Group as={Row} controlId="formLargeCategory">
+                    <Form.Group as={Row} controlId="formMajorCategory">
                         <Form.Label column sm="2">대분류</Form.Label>
                         <Col sm="10">
                             <Form.Select
-                                value={largeCategory} onChange={handleLargeCategoryChange}>
+                                value={category.majorCategoryId} onChange={handleMajorCategoryChange}>
                                 <option value="">대분류 선택</option>
-                                {largeCategories.map((cat) => (
-                                    <option key={cat.id} value={cat.id}>{cat.name}</option>
+                                {majorCategories.map((cat) => (
+                                    <option key={cat.majorCategoryId} value={cat.majorCategoryId}>{cat.name}</option>
                                 ))}
                             </Form.Select>
                         </Col>
@@ -388,70 +280,19 @@ function ProductRegistration() {
 
                 {/* 소분류 선택 */}
                 <Row className="mb-3">
-                    <Form.Group as={Row} controlId="formSmallCategory">
+                    <Form.Group as={Row} controlId="formSubCategory">
                         <Form.Label column sm="2">소분류</Form.Label>
                         <Col sm="10">
                             <Form.Select
-                                value={smallCategory} onChange={handleSmallCategoryChange} disabled={!largeCategory} >
+                                value={category.subCategoryId} onChange={handleSubCategoryChange} disabled={!category.majorCategoryId}>
                                 <option value="">소분류 선택</option>
-                                {largeCategory && smallCategories[largeCategory]?.map((cat) => (
-                                    <option key={cat.id} value={cat.id}>{cat.name}</option>
+                                {subCategories.map((cat) => (
+                                    <option key={cat.subCategoryId} value={cat.subCategoryId}>{cat.name}</option>
                                 ))}
                             </Form.Select>
                         </Col>
                     </Form.Group>
                 </Row>
-
-                {/* 카테고리 번호, 추후 카테고리 select 할 수 있도록 dropdown으로 변경 예정 */}
-                {/* <Row className="mb-3">
-          <Form.Group as={Row} controlId="formCategoryNumber">
-            <Form.Label column sm="2">카테고리 번호</Form.Label>
-            <Col sm="10">
-              <Form.Control type="number" name="categoryNumber" value={category.categoryNumber} onChange={handleCategoryChange} />
-            </Col>
-          </Form.Group>
-        </Row> */}
-                {/* 대분류 선택 드롭다운 */}
-                {/* <Row className="mb-3">
-          <Form.Group as={Row} controlId="formLargeCategory">
-            <Form.Label column sm="2">대분류</Form.Label>
-            <Col sm="10">
-              <Form.Select
-                name="largeCategory"
-                value={typeof category.categoryNumber === 'string' ? category.categoryNumber.substring(2, 4) : ''}
-                onChange={handleLargeCategoryChange}
-              >
-                <option value="">대분류 선택</option>
-                {largeCategories.map((largeCategory) => (
-                  <option key={largeCategory.id} value={largeCategory.id}>{largeCategory.name}</option>
-                ))}
-              </Form.Select>
-            </Col>
-          </Form.Group>
-        </Row> */}
-
-                {/* 소분류 선택 드롭다운 */}
-                {/* <Row className="mb-3">
-          <Form.Group as={Row} controlId="formSmallCategory">
-            <Form.Label column sm="2">소분류</Form.Label>
-            <Col sm="10">
-              <Form.Select
-                name="smallCategory"
-                value={category.categoryNumber.substring(2, 4)}
-                onChange={handleSmallCategoryChange}
-                disabled={smallCategories.length === 0}
-              >
-                <option value="">소분류 선택</option>
-                {smallCategories.map((smallCategory) => (
-                  <option key={smallCategory.id} value={smallCategory.id}>{smallCategory.name}</option>
-                ))}
-              </Form.Select>
-            </Col>
-          </Form.Group>
-        </Row> */}
-                {/* 카테고리 번호 출력 (디버깅용) */}
-                {/* <div>카테고리 번호: {category.categoryNumber}</div> */}
-
 
                 {/* 판매자 이메일, 추후 로그인한 판매자 이메일이 자동으로 들어가도록 수정 예정 */}
                 <Row className="mb-3">
@@ -504,112 +345,27 @@ function ProductRegistration() {
                                     onChange={(e) => handleProductDetailChange(e, index)} />
                             </Form.Group>
                         </Col>
-                        <Col md={1} className="align-self-center">
+                        <Col md={1} className="align-self-center" style={{marginTop:'30px'}}>
                             {productDetails.length > 1 && (
                                 <Button variant="danger" onClick={() => handleRemoveProductDetail(index)}>&#x2715;</Button>
                             )}
                         </Col>
                     </Row>
+
                 </Container>
             ))}
+            <br></br><br></br>
+            <Container>
+                <Row>
+                    <Col md={6}><label htmlFor="thumbnailImage" style={{ fontSize: '20px', fontWeight: '600', marginBottom:'5px' }}>썸네일 이미지 등록</label>
+                        <input type="file" className="form-control" id="thumbnailImage" /></Col>
+                    <Col md={6}><label htmlFor="additionalImages" style={{ fontSize: '20px', fontWeight: '600', marginBottom:'5px' }}>추가 이미지 등록</label>
+                        <input type="file" className="form-control" id="additionalImages" multiple /></Col>
+                </Row>
+            </Container>
 
-            {/* //   <Row className="mb-3">
-      //     <Form.Group as={Row} controlId="formColor">
-      //       <Form.Label column sm="2">색상</Form.Label>
-      //       <Col sm="10">
-      //         <Form.Control type="text" name="color" value={productDetail.color} onChange={handleProductDetailChange} />
-      //       </Col>
-      //     </Form.Group>
-      //   </Row>
-
-      //   <Row className="mb-3">
-      //     <Form.Group as={Row} controlId="formSize">
-      //       <Form.Label column sm="2">사이즈</Form.Label>
-      //       <Col sm="10">
-      //         <Form.Control type="text" name="size" value={productDetail.size} onChange={handleProductDetailChange} />
-      //       </Col>
-      //     </Form.Group>
-      //   </Row>
-
-      //   <Row className="mb-3">
-      //     <Form.Group as={Row} controlId="formRemaining">
-      //       <Form.Label column sm="2">재고</Form.Label>
-      //       <Col sm="10">
-      //         <Form.Control type="number" name="remaining" value={productDetail.remaining} onChange={handleProductDetailChange} />
-      //       </Col>
-      //     </Form.Group>
-      //   </Row>
-
-      //   <Row className="mb-3">
-      //     <Form.Group as={Row} controlId="formPrice">
-      //       <Form.Label column sm="2">가격</Form.Label>
-      //       <Col sm="10">
-      //         <Form.Control type="number" name="price" value={productDetail.price} onChange={handleProductDetailChange} />
-      //       </Col>
-      //     </Form.Group>
-      //   </Row>
-      // </Container> */}
-
-            {/* <table>
-      //   <tbody>
-      //     <tr>
-      //       <td>이름</td>
-      //       <td><input type="text" name="name" value={category.name} onChange={handleCategoryChange} /></td>
-      //     </tr>
-      //     <tr>
-      //       <td>상세 설명</td>
-      //       <td><input type="text" name="detail" value={category.detail} onChange={handleCategoryChange} /></td>
-      //     </tr>
-      //     <tr>
-      //       <td>성별 카테고리</td>
-      //       <td><input type="number" name="genderCategory" value={category.genderCategory} onChange={handleCategoryChange} /></td>
-      //     </tr>
-      //     <tr>
-      //       <td>대분류 카테고리</td>
-      //       <td><input type="number" name="largeCategory" value={category.largeCategory} onChange={handleCategoryChange} /></td>
-      //     </tr>
-      //     <tr>
-      //       <td>소분류 카테고리</td>
-      //       <td><input type="number" name="smallCategory" value={category.smallCategory} onChange={handleCategoryChange} /></td>
-      //     </tr>
-      //     <tr>
-      //       <td>판매자 이메일</td>
-      //       <td><input type="email" name="sellerEmail" value={category.sellerEmail} onChange={handleCategoryChange} /></td>
-      //     </tr>
-      //     <tr>
-      //       <td>색상</td>
-      //       <td><input type="text" name="color" value={productDetail.color} onChange={handleProductDetailChange} /></td>
-      //     </tr>
-      //     <tr>
-      //       <td>사이즈</td>
-      //       <td><input type="text" name="size" value={productDetail.size} onChange={handleProductDetailChange} /></td>
-      //     </tr>
-      //     <tr>
-      //       <td>재고</td>
-      //       <td><input type="number" name="remaining" value={productDetail.remaining} onChange={handleProductDetailChange} /></td>
-      //     </tr>
-      //     <tr>
-      //       <td>가격</td>
-      //       <td><input type="number" name="price" value={productDetail.price} onChange={handleProductDetailChange} /></td>
-      //     </tr>
-      //     <tr>
-      //       <td>상품 ID</td>
-      //       <td>
-      //         {productDetail.clothesId}
-      //         {/* <input type="number" name="clothesId" value={productDetail.clothesId} onChange={handleProductDetailChange} /> */}
-            {/* </td>
-    //       </tr >
-    // <tr>
-    //   <td>상품 이미지</td>
-    //   <td><input class="form-control mt-2" type="file" id="image" /></td>
-    // </tr>
-    //     </tbody >
-    //   </table > * /} */}
-            {/* 상품 이미지 등록
-       <input class="form-control mt-2" type="file" id="image" /> */}
-            <input className="form-control mt-2" type="file" id="image" style={{ width: '500px', marginLeft: '150px' }} multiple />
             <br></br>
-            <StyledButton type="submit">상품 등록하기</StyledButton>
+            <StyledButton onClick={() => { console.log(category) }} type="submit">상품 등록하기</StyledButton>
         </form >
 
 

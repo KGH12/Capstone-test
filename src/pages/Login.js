@@ -65,7 +65,7 @@ function Login(props) {
   }
 
   let onClickConfirmButton = () => {
-    axios.get(`http://localhost:8080/customers/${email}/${pw}`)
+    axios.get(`${process.env.REACT_APP_API_URL}/customers/${email}/${pw}`)
       .then((result) => {
         if (result.data == true) {
           if (rememberMe == true) {
@@ -81,7 +81,7 @@ function Login(props) {
           dispatch(login({ 'email_id': email }));
 
           // 장바구니 데이터 가져오기
-          axios.get(`http://localhost:8080/cart/${email}`)
+          axios.get(`${process.env.REACT_APP_API_URL}/cart/${email}`)
             .then(result => {
               dispatch(setCartItems(result.data));
             })

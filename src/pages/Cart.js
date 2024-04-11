@@ -155,7 +155,7 @@ function CartItem(props) {
                 <Col xs={5} md={1} style={{ marginTop: '12px' }}>
                     <Dropdown onSelect={(eventKey) => {
                         const newQuantity = parseInt(eventKey, 10);
-                        axios.put(`http://localhost:8080/cart/${userInfo.email_id}/${props.item.detailId}`, { quantity: newQuantity })
+                        axios.put(`${process.env.REACT_APP_API_URL}/cart/${userInfo.email_id}/${props.item.detailId}`, { quantity: newQuantity })
                             .then(result => {
                                 // 장바구니 상태 업데이트
                                 dispatch(updateItemQuantity({ detailId: props.item.detailId, quantity: newQuantity }));
@@ -182,7 +182,7 @@ function CartItem(props) {
                 </Col>
                 <Col xs={2} md={1}>
                     <CloseButton onClick={() => {
-                        axios.delete(`http://localhost:8080/cart/${userInfo.email_id}/${props.item.detailId}`)
+                        axios.delete(`${process.env.REACT_APP_API_URL}/cart/${userInfo.email_id}/${props.item.detailId}`)
                             .then(result => {
                                 dispatch(removeFromCart(props.item));
                             })
@@ -217,7 +217,7 @@ function Cart(props) {
             alert('로그인 후 이용해주세요.')
             navigate('/login');
         } else {
-            axios.get(`http://localhost:8080/cart/${userInfo.email_id}`)
+            axios.get(`${process.env.REACT_APP_API_URL}/cart/${userInfo.email_id}`)
                 .then(result => {
                     dispatch(setCartItems(result.data));
                 })
@@ -277,7 +277,7 @@ function Cart(props) {
                 </Row>
                 <Row>
                     <Col xs={12} md={{ span: 10, offset: 1 }}>
-                        <hr style={{ border: 0, height: '2px', background: 'black' }} />
+                        <div style={{ height: '2px', backgroundColor: '#000000' }}></div>
                     </Col>
                 </Row>
                 {cartItems.map(item => (
