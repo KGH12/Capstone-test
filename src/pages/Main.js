@@ -87,21 +87,21 @@ function Main(props) {
         <div>
             {/* <div className="main-bg" style={{ backgroundImage: 'url(' + bg + ')', marginBottom: '20px' }}></div> */}
             <Carousel activeIndex={index} onSelect={handleSelect}>
-                <Carousel.Item>
+                <Carousel.Item interval={3000}>
                     <ExampleCarouselImage text="First slide" productName='sneakers1' />
                     <Carousel.Caption>
                         <h3>First slide label</h3>
                         <p>Nulla vitae elit libero, a pharetra augue mollis interdum.</p>
                     </Carousel.Caption>
                 </Carousel.Item>
-                <Carousel.Item>
+                <Carousel.Item interval={3000}>
                     <ExampleCarouselImage text="Second slide" productName='scarf1' />
                     <Carousel.Caption>
                         <h3>Second slide label</h3>
                         <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
                     </Carousel.Caption>
                 </Carousel.Item>
-                <Carousel.Item>
+                <Carousel.Item interval={3000}>
                     <ExampleCarouselImage text="Third slide" productName='beachwear1' />
                     <Carousel.Caption>
                         <h3>Third slide label</h3>

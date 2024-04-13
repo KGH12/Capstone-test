@@ -113,7 +113,7 @@ function ItemList(props) {
         <Link to="/detail" style={{ color: 'gray', textDecoration: 'none', margin: '0 5px' }}>티셔츠</Link>
       </div> */}
 
-      <Container>
+      {/* <Container>
         <Row className="justify-content-start" style={{ fontSize: '12px', color: 'gray', margin: '10px 15px' }}>
           <Col xs={12} md={12} className="text-nowrap" style={{ textAlign: 'left' }}>
             <Link to="/" style={{ color: 'gray', textDecoration: 'none', marginRight: '5px' }}>홈</Link>
@@ -121,6 +121,40 @@ function ItemList(props) {
             <Link to="/detail" style={{ color: 'gray', textDecoration: 'none', margin: '0 5px' }}>남성</Link>
             <span>&gt;</span>
             <Link to="/detail" style={{ fontWeight: 'bold', color: 'black', textDecoration: 'none', margin: '0 5px' }}>티셔츠</Link>
+          </Col>
+        </Row>
+      </Container> */}
+
+<Container>
+        <Row className="justify-content-start" style={{ fontSize: '12px', color: 'gray', margin: '10px 15px' }}>
+          <Col xs={12} md={12} className="text-nowrap" style={{ textAlign: 'left' }}>
+            <Link to="/" style={{ color: !category ? 'black' : 'gray', textDecoration: 'none', marginRight: '5px' }}>
+              홈
+            </Link>
+            {category && (
+              <>
+                <span>&gt;</span>
+                <Link to={`/itemlist/${category}`} style={{ color: !major ? 'black' : 'gray', textDecoration: 'none', margin: '0 5px' }}>
+                  {category}
+                </Link>
+              </>
+            )}
+            {major && (
+              <>
+                <span>&gt;</span>
+                <Link to={`/itemlist/${category}/${major}`} style={{ color: !minor ? 'black' : 'gray', textDecoration: 'none', margin: '0 5px' }}>
+                  {major}
+                </Link>
+              </>
+            )}
+            {minor && (
+              <>
+                <span>&gt;</span>
+                <Link to={`/itemlist/${category}/${major}/${minor}`} style={{ color: 'black', textDecoration: 'none', margin: '0 5px' }}>
+                  {minor}
+                </Link>
+              </>
+            )}
           </Col>
         </Row>
       </Container>
@@ -161,15 +195,15 @@ function ItemList(props) {
 
       <Container>
         <Row className="justify-content-end">
-          <Col xs={2} md={2}>
+          <Col xs={12} md={12} className="text-nowrap" style={{ textAlign: 'right', marginBottom:'10px' }}>
             <Dropdown>
               <Dropdown.Toggle
                 variant="success"
                 id="dropdown-basic"
                 className="bg-transparent border-0 text-dark btn-sm" // 배경, 테두리 없애고 글씨는 검은색으로, 작은 크기
-              >              인기상품순 {'('} 전체 {')'}
+              >인기상품순 {'('} 전체 {')'}
               </Dropdown.Toggle>
-              <Dropdown.Menu>
+              <Dropdown.Menu align="end">
                 <Dropdown.Item href="#/action-1">신상품순</Dropdown.Item>
                 <Dropdown.Item href="#/action-2">인기상품순</Dropdown.Item>
                 <Dropdown.Item href="#/action-3">낮은가격순</Dropdown.Item>
@@ -195,8 +229,27 @@ function ItemList(props) {
               )
             })
           }
+        </Row>
+        <Row>
+          <div className="d-flex justify-content-center" style={{ marginTop: '50px' }}>
+            <Pagination>
+              <Pagination.First />
+              <Pagination.Prev />
+              <Pagination.Item>{1}</Pagination.Item>
+              <Pagination.Ellipsis />
 
+              <Pagination.Item>{10}</Pagination.Item>
+              <Pagination.Item>{11}</Pagination.Item>
+              <Pagination.Item active>{12}</Pagination.Item>
+              <Pagination.Item>{13}</Pagination.Item>
+              <Pagination.Item disabled>{14}</Pagination.Item>
 
+              <Pagination.Ellipsis />
+              <Pagination.Item>{20}</Pagination.Item>
+              <Pagination.Next />
+              <Pagination.Last />
+            </Pagination>
+          </div>
         </Row>
       </Container>
 
@@ -226,25 +279,7 @@ function ItemList(props) {
       {/* <Pagination currentPage={currentPage} totalPages={totalPages} /> */}
 
 
-      <div className="d-flex justify-content-center" style={{ marginTop: '50px' }}>
-        <Pagination>
-          <Pagination.First />
-          <Pagination.Prev />
-          <Pagination.Item>{1}</Pagination.Item>
-          <Pagination.Ellipsis />
 
-          <Pagination.Item>{10}</Pagination.Item>
-          <Pagination.Item>{11}</Pagination.Item>
-          <Pagination.Item active>{12}</Pagination.Item>
-          <Pagination.Item>{13}</Pagination.Item>
-          <Pagination.Item disabled>{14}</Pagination.Item>
-
-          <Pagination.Ellipsis />
-          <Pagination.Item>{20}</Pagination.Item>
-          <Pagination.Next />
-          <Pagination.Last />
-        </Pagination>
-      </div>
 
     </div>
   )
