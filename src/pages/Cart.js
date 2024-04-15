@@ -297,8 +297,7 @@ function Cart(props) {
                     ))}
                 </Row>
                 <Row>
-                    <Col xs={9} md={{ span: 6, offset: 1 }}></Col>
-                    <Col xs={3} md={{ span: 4 }} style={{ fontSize: '17px', fontWeight: '700' }}>
+                    <Col style={{ textAlign:'right', fontSize: '17px', fontWeight: '700', whiteSpace: 'nowrap' }}>
                         총 주문금액 {totalAmount.toLocaleString()}원
                     </Col>
                 </Row>

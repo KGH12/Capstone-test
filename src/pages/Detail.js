@@ -40,9 +40,6 @@ const StyledDropdownMenu = styled(Dropdown.Menu)`
 
 function Detail(props) {
 
-    // Redux
-    // let state = useSelector((state) => { return state })
-    // let shoes = state.shoes
     let dispatch = useDispatch()
     const { userInfo, isLoggedIn } = useSelector((state) => state.user);
 
@@ -63,12 +60,6 @@ function Detail(props) {
     // 2초 이내 구매
     // let [eventAlert, setEventAlert] = useState(true)
 
-
-
-    // 선택된 상품 데이터
-    // let selectedShoes = shoes.find(function (item) {
-    //     return item.id == clothesId
-    // });
 
     useEffect(() => {
         axios.get(`${process.env.REACT_APP_API_URL}/clothes/${clothesId}`)
@@ -199,13 +190,6 @@ function Detail(props) {
                             </StyledDropdownMenu>
                         </Dropdown>
 
-
-
-                        {/* <button className="btn btn-danger" style={{marginTop:'10px'}} onClick={() => {
-                            // let item = { id: selectedShoes.id, name: selectedShoes.title, count: 1 }
-                            // dispatch(addToCart(item))
-                            // alert(item.name + ' 장바구니에 추가되었습니다.')
-                        }}>주문하기</button> */}
                         <Row style={{ marginTop: '10px' }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                 <div>

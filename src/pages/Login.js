@@ -150,58 +150,58 @@ function Login(props) {
       <Container>
         <Row>
           <Col>
-      <Form className='login-ContentWrap'>
-        <Form.Group className="mb-3 text-start" controlId="formBasicEmail">
-          <Form.Label className='login-InputTitle'>아이디(이메일)</Form.Label>
-          <div className='login-InputWrap'>
-            <Form.Control
-              id="email-input"
-              value={email}
-              onChange={handleEmail}
-              type="email"
-              placeholder="아이디(이메일)를 입력하세요."
-              className='login-Input' />
-          </div>
-          <Form.Text className="login-ErrorMessageWrap">
-            {
-              !emailValid && email.length > 0 && (
-                <div>이메일을 올바르게 입력해주세요.</div>
-              )
-            }
-          </Form.Text>
-        </Form.Group>
+            <Form className='login-ContentWrap'>
+              <Form.Group className="mb-3 text-start" controlId="formBasicEmail">
+                <Form.Label className='login-InputTitle'>아이디(이메일)</Form.Label>
+                <div className='login-InputWrap'>
+                  <Form.Control
+                    id="email-input"
+                    value={email}
+                    onChange={handleEmail}
+                    type="email"
+                    placeholder="아이디(이메일)를 입력하세요."
+                    className='login-Input' />
+                </div>
+                <Form.Text className="login-ErrorMessageWrap">
+                  {
+                    !emailValid && email.length > 0 && (
+                      <div>이메일을 올바르게 입력해주세요.</div>
+                    )
+                  }
+                </Form.Text>
+              </Form.Group>
 
-        <Form.Group className="mb-3 text-start" controlId="formBasicPassword">
-          <Form.Label className='login-InputTitle'>비밀번호</Form.Label>
-          <div className='login-InputWrap'>
-            <Form.Control
-              id="password-input"
-              value={pw}
-              onChange={handlePw}
-              type="password" placeholder="비밀번호를 입력하세요." className='login-Input' />
-          </div>
-          <Form.Text className="login-ErrorMessageWrap">
-            {
-              !pwValid && pw.length > 0 && (
-                <div>영문, 숫자, 특수문자 포함 8자 이상 입력해주세요.</div>
-              )
-            }
-          </Form.Text>
-        </Form.Group>
-        <Form.Group className="mb-3 d-flex" controlId="formBasicCheckbox">
-          <Form.Check type="checkbox" checked={rememberMe}
-            onChange={handleCheckboxChange}
-            label="아이디 저장" />
-        </Form.Group>
-        <Button onClick={onClickConfirmButton} disabled={notAllow} variant="primary" className='login-Button'>
-          로그인
-        </Button>
-        <Button onClick={() => { navigate('/join') }} variant="primary" className='join-Button'>
-          회원가입
-        </Button>
-      </Form>
-      </Col>
-      </Row>
+              <Form.Group className="mb-3 text-start" controlId="formBasicPassword">
+                <Form.Label className='login-InputTitle'>비밀번호</Form.Label>
+                <div className='login-InputWrap'>
+                  <Form.Control
+                    id="password-input"
+                    value={pw}
+                    onChange={handlePw}
+                    type="password" placeholder="비밀번호를 입력하세요." className='login-Input' />
+                </div>
+                <Form.Text className="login-ErrorMessageWrap">
+                  {
+                    !pwValid && pw.length > 0 && (
+                      <div>영문, 숫자, 특수문자 포함 8자 이상 입력해주세요.</div>
+                    )
+                  }
+                </Form.Text>
+              </Form.Group>
+              <Form.Group className="mb-3 d-flex" controlId="formBasicCheckbox">
+                <Form.Check type="checkbox" checked={rememberMe}
+                  onChange={handleCheckboxChange}
+                  label="아이디 저장" />
+              </Form.Group>
+              <Button onClick={onClickConfirmButton} disabled={notAllow} variant="primary" className='login-Button'>
+                로그인
+              </Button>
+              <Button onClick={() => { navigate('/join') }} variant="primary" className='join-Button'>
+                회원가입
+              </Button>
+            </Form>
+          </Col>
+        </Row>
       </Container>
     </div>
   )

@@ -39,20 +39,9 @@ function Mypage(props) {
             <br /><br /></Col>
         </Row>
         <Row>
-          <Col xs={2} md={2}>
-            {/* <table style={{border:'none', fontSize: '18px', fontWeight: '500' }}>
-                  <tr>
-                    <td>주문/배송 조회</td>
-                  </tr>
-                  <tr>
-                  <td>회원정보 수정</td>
-                  </tr>
-                  <tr>
-                    <td>회원 탈퇴</td>
-                  </tr>
-                </table> */}
-            <ListGroup >
-            {/* defaultActiveKey="#link1" */}
+          <Col xs={12} md={2}>
+            <ListGroup style={{ marginBottom: '20px' }}>
+              {/* defaultActiveKey="#link1" */}
               <ListGroup.Item action onClick={() => {
                 navigate('/Mypage/orderDeliveryStatus')
                 setCurrentPage('주문/배송 조회')
@@ -73,18 +62,9 @@ function Mypage(props) {
                 회원 탈퇴
               </ListGroup.Item>
             </ListGroup>
-
-
+            <div style={{ height: '2px', backgroundColor: 'gray', marginBottom:'20px'}}></div>
           </Col>
-          <Col xs={10} md={10}>
-            {/* <Image src={process.env.PUBLIC_URL + '/img/ronaldo.jpg'} style={{ width: '170px', height: '170px', borderRadius: '50%' }} roundedCircle />
-                  <h1 style={{ fontSize: '20px', fontWeight: '500' }}>홍길동 님<br /> qwer@hansung.ac.kr</h1>
-                  <br />
-                  <h1 style={{ fontSize: '20px', fontWeight: '500' }}>첫 구매하고 포인트 받으세요!</h1>
-
-                  <br />
-                  <Button variant="primary">회원정보 수정</Button>{' '}
-                  <Button variant="danger">회원탈퇴</Button>{' '} */}
+          <Col xs={12} md={10}>
             <Outlet></Outlet>
           </Col>
         </Row>

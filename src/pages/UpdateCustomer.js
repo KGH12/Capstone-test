@@ -17,9 +17,8 @@ function UpdateCustomer(props) {
     let [name, setName] = useState('');
     let [address, setAddress] = useState('');
     let [zoneCode, setZoneCode] = useState('');
-    let [fullAddress, setFullAddress] = useState('');
+    let [detailAddress, setDetailAddress] = useState('');
     let [showPostcode, setShowPostcode] = useState(false);
-    // let [phone, setPhone] = useState('');
     let [phone1, setPhone1] = useState('');
     let [phone2, setPhone2] = useState('');
     let [phone3, setPhone3] = useState('');
@@ -29,7 +28,6 @@ function UpdateCustomer(props) {
     let [pwValid, setPwValid] = useState(false);
     let [pwConfirmValid, setPwConfirmValid] = useState(false);
     let [notAllow, setNotAllow] = useState(true);
-
 
     // 우편번호 검색 후 실행될 콜백 함수
     const handleComplete = (data) => {
@@ -48,6 +46,7 @@ function UpdateCustomer(props) {
 
         setZoneCode(data.zonecode);
         setAddress(fullAddress);
+        setDetailAddress('');
         // setFullAddress(data.jibunAddress); // 또는 roadAddress 등 필요에 따라 선택
         setShowPostcode(false);
     };
@@ -113,7 +112,7 @@ function UpdateCustomer(props) {
     }
 
     let onClickConfirmButton = () => {
-        axios.put(`${process.env.REACT_APP_API_URL}/customers/${userInfo.email_id}`, { address: address + ' ' + fullAddress, name: name, password: pw, phone: phone1 + '-' + phone2 + '-' + phone3 })
+        axios.put(`${process.env.REACT_APP_API_URL}/customers/${userInfo.email_id}`, { streetAddress: address, detailAddress: detailAddress, zipCode: zoneCode, name: name, password: pw, phone: phone1 + '-' + phone2 + '-' + phone3 })
             .then((result) => {
                 alert('회원정보 수정 완료');
                 dispatch(pwConfirmReset());
@@ -126,17 +125,21 @@ function UpdateCustomer(props) {
 
     // 비밀번호 확인을 하지 않은 상태라면 비밀번호 확인 페이지로 리디렉션
     useEffect(() => {
-        if (!isPwConfirm) {
+
+        if (!isLoggedIn) {
+            alert('로그인 후 이용해주세요.')
+            navigate('/login');
+        } else if (!isPwConfirm) {
             alert('비밀번호 확인 후 이용해주세요.')
             navigate('/Mypage/PwConfirm');
-        }
-
-        if (isLoggedIn) {
+        } else {
             axios.get(`${process.env.REACT_APP_API_URL}/customers/${userInfo.email_id}`)
                 .then(response => {
                     const userData = response.data;
                     setName(userData.name);
-                    setAddress(userData.address);
+                    setAddress(userData.streetAddress);
+                    setDetailAddress(userData.detailAddress);
+                    setZoneCode(userData.zipCode.toString());
                     const phoneNumbers = userData.phone.split('-');
                     setPhone1(phoneNumbers[0]);
                     setPhone2(phoneNumbers[1]);
@@ -145,18 +148,17 @@ function UpdateCustomer(props) {
                 .catch(error => {
                     console.error("사용자 정보 불러오기 실패", error);
                 });
-            } else {
-                // 로그인하지 않은 경우 로그인 페이지로 이동 등의 처리
-            }
-    }, [isLoggedIn, userInfo.email_id]);
+        }
+
+    }, []);
 
     useEffect(() => {
-        if (name.trim() !== '' && address.trim() !== '' && fullAddress.trim() !== '' && zoneCode.trim() !== '' && phone1.trim() !== '' && phone2.trim() !== '' && phone3.trim() !== '' && pwValid && pwConfirmValid) {
+        if (name.trim() !== '' && address.trim() !== '' && detailAddress.trim() !== '' && zoneCode.trim() !== '' && phone1.trim() !== '' && phone2.trim() !== '' && phone3.trim() !== '' && pwValid && pwConfirmValid) {
             setNotAllow(false);
             return;
         }
         setNotAllow(true);
-    }, [name, address, fullAddress, zoneCode, phone1, phone2, phone3, pwValid, pwConfirmValid]);
+    }, [name, address, detailAddress, zoneCode, phone1, phone2, phone3, pwValid, pwConfirmValid]);
 
 
     useEffect(() => {
@@ -252,11 +254,11 @@ function UpdateCustomer(props) {
 
                 </Form.Group>
 
-                <Form.Group className="mb-3 text-start" controlId="formBasicFullAddress">
+                <Form.Group className="mb-3 text-start" controlId="formBasicDetailAddress">
                     <div className='login-InputWrap'>
                         <Form.Control
-                            value={fullAddress}
-                            onChange={(e) => setFullAddress(e.target.value)}
+                            value={detailAddress}
+                            onChange={(e) => setDetailAddress(e.target.value)}
                             type="text"
                             placeholder="상세주소 입력"
                             className='login-Input'
@@ -264,7 +266,7 @@ function UpdateCustomer(props) {
                     </div>
                     <Form.Text className="login-ErrorMessageWrap">
                         {
-                            address.length > 0 && fullAddress.length == 0 && (
+                            address.length > 0 && detailAddress.length == 0 && (
                                 <div>상세주소를 입력해주세요.</div>
                             )
                         }
