@@ -152,24 +152,24 @@ function ProductRegistration() {
         e.preventDefault();
         setLoading(true);  // 제출 시작시 로딩 상태를 true로 설정
 
-        // 썸네일 이미지 파일
+        // 썸네일 이미지 파일과 추가 이미지 파일들
         const thumbnailFile = document.querySelector('#thumbnailImage').files[0];
-        // 추가 이미지 파일들
         const additionalFiles = document.querySelector('#additionalImages').files;
 
         if (!thumbnailFile) {
             alert('썸네일 이미지 파일을 선택해 주세요.');
+            setLoading(false);
             return;
         }
         if (additionalFiles.length === 0) {
             alert('상품 이미지 파일을 선택해 주세요.');
+            setLoading(false);
             return;
         }
 
         try {
             // 이미지 업로드 및 URL들을 얻음
             const [thumbnailImageUrl] = await handleUploadImages(thumbnailFile);
-
             const additionalImageUrls = additionalFiles.length > 0 ? await handleUploadImages(additionalFiles) : [];
 
             // Category 정보를 서버로 전송하고 응답을 받음
@@ -177,8 +177,9 @@ function ProductRegistration() {
                 ...category,
                 sellerEmail: sellerInfo.email_id
             });
-            console.log('Category Response:', categoryResponse.data);
 
+            console.log('Category Response:', categoryResponse.data);
+           
             // 상품의 category 등록에 성공한 후, 각 detail 등록
             for (let detail of productDetails) {
                 // // 이미지 URL을 detail 객체에 추가
@@ -209,15 +210,23 @@ function ProductRegistration() {
                 });
             }));
 
+            const clothesId = categoryResponse.data.clothesId; // 응답에서 clothesId 추출
+
+            // 이제 `clothesId`를 사용하여 수정 페이지로 리디렉션
+            navigate(`/seller/productedit/${clothesId}`);
+
+            // 상품 등록에 성공했습니다 알림을 나중에 표시
             alert('상품 등록에 성공했습니다.');
 
         } catch (error) {
             console.error('Submitting error:', error);
             alert('상품 등록에 실패했습니다.');
+            setLoading(false);
         }
 
         setLoading(false);
     };
+
 
     return (
 

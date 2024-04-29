@@ -20,12 +20,15 @@ function Mypage(props) {
 
   // 로그인하지 않은 상태라면 로그인 페이지로 리디렉션
   useEffect(() => {
+    if (!isLoggedIn || !userInfo) {
+      return; // 로그인 상태나 sellerInfo가 유효하지 않은 경우 early return을 사용
+    }
     if (!isLoggedIn) {
       // 로그인하지 않은 상태라면 로그인 페이지로 리디렉션
       alert('로그인 후 이용해주세요.')
       navigate('/login');
     }
-  });
+  }, [isLoggedIn, userInfo]);
 
   return (
     <div>
@@ -62,7 +65,7 @@ function Mypage(props) {
                 회원 탈퇴
               </ListGroup.Item>
             </ListGroup>
-            <div style={{ height: '2px', backgroundColor: 'gray', marginBottom:'20px'}}></div>
+            <div style={{ height: '2px', backgroundColor: 'gray', marginBottom: '20px' }}></div>
           </Col>
           <Col xs={12} md={10}>
             <Outlet></Outlet>

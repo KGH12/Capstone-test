@@ -1,13 +1,14 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import "firebase/firestore";
-import { storage } from "../firebaseConfig.js";
-import { ref, uploadBytes, getDownloadURL, uploadString } from "firebase/storage";
-import { Container, Row, Col, Form, Button, Spinner } from 'react-bootstrap';
+import { Container, Row, Col, Form, Button, Spinner, Image } from 'react-bootstrap';
 import { FaPlusCircle } from "react-icons/fa";
 import styled from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
+import "firebase/firestore";
+import { storage } from "../firebaseConfig.js";
+import { ref, uploadBytes, getDownloadURL, uploadString } from "firebase/storage";
+import { getStorage, deleteObject } from "firebase/storage";
 
 
 let StyledButton = styled.button`
@@ -59,6 +60,16 @@ function ProductEdit(props) {
         clothesId: 0
     }]);
 
+    const [clothesImages, setClothesImages] = useState([{
+        clothesId: '',
+        imageUrl: '',
+        order: 0,
+    }]);
+
+    // 썸네일 이미지(주문 번호 1)와 추가 이미지(주문 번호 1이 아닌 것들) 필터링
+    const thumbnailImage = clothesImages.find(image => image.order === 1);
+    const additionalImages = clothesImages.filter(image => image.order !== 1);
+
     const [majorCategories, setMajorCategories] = useState([]);
     const [subCategories, setSubCategories] = useState([]);
 
@@ -90,6 +101,14 @@ function ProductEdit(props) {
                 console.error("상품 상세 정보 불러오기 실패", error);
             });
 
+        axios.get(`${process.env.REACT_APP_API_URL}/clothes_images/${editid}`)
+            .then(response => {
+                const clothesImagesData = response.data;
+                setClothesImages(clothesImagesData);
+            })
+            .catch(error => {
+                console.error("상품 상세 정보 불러오기 실패", error);
+            });
     }, []);
 
 
@@ -145,26 +164,59 @@ function ProductEdit(props) {
         }));
     };
 
+    // const handleProductDetailChange = (e, index) => {
+    //     const { name, value } = e.target;
+    //     const list = [...productDetails];
+    //     list[index][name] = value;
+    //     setProductDetails(list);
+    // };
     const handleProductDetailChange = (e, index) => {
         const { name, value } = e.target;
         const list = [...productDetails];
-        list[index][name] = value;
+        list[index] = { ...list[index], [name]: value };
         setProductDetails(list);
     };
 
     // 상품 상세 정보 추가
+    // const handleAddProductDetail = () => {
+    //     setProductDetails([...productDetails, { color: '', size: '', remaining: 0, clothesId: 0 }]);
+    // };
     const handleAddProductDetail = () => {
-        setProductDetails([...productDetails, { color: '', size: '', remaining: 0, clothesId: 0 }]);
+        setProductDetails([...productDetails, { color: '', size: '', remaining: 0, clothesId: 0, isNew: true }]);
     };
 
     // 상품 상세 정보 제거
-    const handleRemoveProductDetail = index => {
+    // const handleRemoveProductDetail = async (index, productDetail) => {
+    //     try {
+    //         await axios.delete(`${process.env.REACT_APP_API_URL}/detail/${productDetail.detailId}`)
+    //             .then(() => {
+    //                 console.log("데이터베이스에서 제거 완료.");
+    //                 const list = [...productDetails];
+    //                 list.splice(index, 1);
+    //                 setProductDetails(list);
+    //                 alert('옵션 제거 완료');
+    //             })
+
+    //     } catch (error) {
+    //         console.error("Error removing image: ", error);
+    //     }
+    // };
+    const handleRemoveProductDetail = async (index, productDetail) => {
+        if (productDetail.detailId && !productDetail.isNew) {
+            try {
+                await axios.delete(`${process.env.REACT_APP_API_URL}/detail/${productDetail.detailId}`);
+                console.log("데이터베이스에서 제거 완료.");
+                alert('옵션 제거 완료');
+            } catch (error) {
+                console.error("Error removing detail: ", error);
+            }
+        }
         const list = [...productDetails];
         list.splice(index, 1);
         setProductDetails(list);
     };
-
-
+    
+   
     const handleUploadImages = async (files) => {
         // FileList 객체를 배열로 변환
         const filesArray = files instanceof FileList ? Array.from(files) : [files];
@@ -184,74 +236,279 @@ function ProductEdit(props) {
     };
 
 
+    // // 제출 처리
+    // const handleSubmit = async (e) => {
+    //     e.preventDefault();
+    //     setLoading(true);  // 제출 시작시 로딩 상태를 true로 설정
+
+    //     // 썸네일 이미지 파일
+    //     const thumbnailFile = document.querySelector('#thumbnailImage').files[0];
+    //     // 추가 이미지 파일들
+    //     const additionalFiles = document.querySelector('#additionalImages').files;
+
+    //     if (!thumbnailFile) {
+    //         alert('썸네일 이미지 파일을 선택해 주세요.');
+    //         return;
+    //     }
+    //     if (additionalFiles.length === 0) {
+    //         alert('상품 이미지 파일을 선택해 주세요.');
+    //         return;
+    //     }
+
+    //     try {
+    //         // 이미지 업로드 및 URL들을 얻음
+    //         const [thumbnailImageUrl] = await handleUploadImages(thumbnailFile);
+
+    //         const additionalImageUrls = additionalFiles.length > 0 ? await handleUploadImages(additionalFiles) : [];
+
+    //         // Category 정보를 서버로 전송하고 응답을 받음
+    //         const categoryResponse = await axios.put(`${process.env.REACT_APP_API_URL}/clothes/${editid}`, category);
+    //         console.log('Category Response:', categoryResponse.data);
+
+    //         // 상품의 category 등록에 성공한 후, 각 detail 등록
+    //         for (let detail of productDetails) {
+    //             // // 이미지 URL을 detail 객체에 추가
+    //             // detail.imageUrl = imageUrls.shift(); // 가정: 각 detail마다 이미지 URL이 1개씩 할당됨
+
+    //             // 서버에 detail 정보 등록
+    //             const detailResponse = await axios.put(`${process.env.REACT_APP_API_URL}/detail/${editid}`, {
+    //                 ...detail,
+    //                 clothesId: editid // 서버로부터 받은 clothesId 사용
+    //             });
+
+    //             console.log('Detail Response:', detailResponse.data);
+    //         }
+
+    //         // 이미지 URL들을 서버로 POST 요청. 첫 번째 이미지는 썸네일로, 나머지는 추가 이미지로 처리
+    //         await axios.post(`${process.env.REACT_APP_API_URL}/clothes_images`, {
+    //             clothesId: editid,
+    //             imageUrl: thumbnailImageUrl, // 첫 번째 이미지 URL
+    //             order: 1 // 썸네일 이미지로 설정
+    //         });
+
+    //         // 나머지 이미지들 처리
+    //         await Promise.all(additionalImageUrls.map((imageUrl, index) => {
+    //             return axios.post(`${process.env.REACT_APP_API_URL}/clothes_images`, {
+    //                 clothesId: editid,
+    //                 imageUrl: imageUrl,
+    //                 order: index + 2 // 추가 이미지들에 대해 순서 설정 (2부터 시작)
+    //             });
+    //         }));
+
+    //         alert('상품 등록에 성공했습니다.');
+
+    //     } catch (error) {
+    //         console.error('Submitting error:', error);
+    //         alert('상품 등록에 실패했습니다.');
+    //     }
+
+    //     setLoading(false);
+    // };
     // 제출 처리
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);  // 제출 시작시 로딩 상태를 true로 설정
 
         // 썸네일 이미지 파일
-        const thumbnailFile = document.querySelector('#thumbnailImage').files[0];
+        // const thumbnailFile = document.querySelector('#thumbnailImage').files[0];
         // 추가 이미지 파일들
         const additionalFiles = document.querySelector('#additionalImages').files;
 
-        if (!thumbnailFile) {
-            alert('썸네일 이미지 파일을 선택해 주세요.');
-            return;
-        }
-        if (additionalFiles.length === 0) {
-            alert('상품 이미지 파일을 선택해 주세요.');
-            return;
-        }
-
         try {
             // 이미지 업로드 및 URL들을 얻음
-            const [thumbnailImageUrl] = await handleUploadImages(thumbnailFile);
+            // let thumbnailImageUrl = '';
+            // if (thumbnailFile) {
+            //     [thumbnailImageUrl] = await handleUploadImages(thumbnailFile);
+            // }
 
-            const additionalImageUrls = additionalFiles.length > 0 ? await handleUploadImages(additionalFiles) : [];
+            let additionalImageUrls = [];
+            if (additionalFiles.length > 0) {
+                additionalImageUrls = await handleUploadImages(additionalFiles);
+            }
 
             // Category 정보를 서버로 전송하고 응답을 받음
             const categoryResponse = await axios.put(`${process.env.REACT_APP_API_URL}/clothes/${editid}`, category);
             console.log('Category Response:', categoryResponse.data);
 
             // 상품의 category 등록에 성공한 후, 각 detail 등록
-            for (let detail of productDetails) {
-                // // 이미지 URL을 detail 객체에 추가
-                // detail.imageUrl = imageUrls.shift(); // 가정: 각 detail마다 이미지 URL이 1개씩 할당됨
+            // for (let detail of productDetails) {
+            //     // 서버에 detail 정보 등록
+            //     const detailResponse = await axios.put(`${process.env.REACT_APP_API_URL}/detail/${editid}`, {
+            //         ...detail,
+            //         clothesId: editid // 서버로부터 받은 clothesId 사용
+            //     });
 
-                // 서버에 detail 정보 등록
-                const detailResponse = await axios.put(`${process.env.REACT_APP_API_URL}/detail/${editid}`, {
-                    ...detail,
-                    clothesId: editid // 서버로부터 받은 clothesId 사용
+            //     console.log('Detail Response:', detailResponse.data);
+            // }
+
+            // const imagesResponse = await axios.put(`${process.env.REACT_APP_API_URL}/clothes_images/${editid}`, clothesImages);
+            // console.log('이미지 수정 완료.');
+
+            const updates = productDetails.map(detail => {
+                if (detail.isNew) {
+                    return axios.post(`${process.env.REACT_APP_API_URL}/detail`, {
+                        ...detail,
+                        clothesId: editid
                 });
-
-                console.log('Detail Response:', detailResponse.data);
+                } else {
+                    return axios.put(`${process.env.REACT_APP_API_URL}/detail/${detail.detailId}`, {
+                        ...detail,
+                        clothesId: editid
+                    });
+                }
+            });
+            
+            // 나머지 이미지들 처리
+            if (additionalImageUrls.length > 0) {
+                await Promise.all(additionalImageUrls.map((imageUrl, index) => {
+                    return axios.post(`${process.env.REACT_APP_API_URL}/clothes_images`, {
+                        clothesId: editid,
+                        imageUrl: imageUrl,
+                        order: clothesImages.length + index + 1 // 추가 이미지들에 대해 순서 설정 (이미지 개수 +1 부터 시작)
+                    });
+                }));
             }
 
-            // 이미지 URL들을 서버로 POST 요청. 첫 번째 이미지는 썸네일로, 나머지는 추가 이미지로 처리
-            await axios.post(`${process.env.REACT_APP_API_URL}/clothes_images`, {
-                clothesId: editid,
-                imageUrl: thumbnailImageUrl, // 첫 번째 이미지 URL
-                order: 1 // 썸네일 이미지로 설정
-            });
-
-            // 나머지 이미지들 처리
-            await Promise.all(additionalImageUrls.map((imageUrl, index) => {
-                return axios.post(`${process.env.REACT_APP_API_URL}/clothes_images`, {
-                    clothesId: editid,
-                    imageUrl: imageUrl,
-                    order: index + 2 // 추가 이미지들에 대해 순서 설정 (2부터 시작)
-                });
-            }));
-
-            alert('상품 등록에 성공했습니다.');
+            alert('상품 수정이 완료되었습니다.');
+            window.location.reload();  // 페이지를 새로고침
 
         } catch (error) {
             console.error('Submitting error:', error);
+            setLoading(false);
             alert('상품 등록에 실패했습니다.');
         }
 
         setLoading(false);
     };
+
+
+
+    // dd
+    // const handleImageOrderChange = (e, index) => {
+    //     const newOrder = parseInt(e.target.value, 10);
+    //     const newImages = clothesImages.map((img, idx) => {
+    //         if (idx === index) {
+    //             return { ...img, order: newOrder };
+    //         }
+    //         return img;
+    //     });
+    //     setClothesImages(newImages);
+    // };
+    const handleImageOrderChange = async (e, index) => {
+        const newOrder = parseInt(e.target.value, 10);
+        const image = clothesImages[index];
+        const oldOrder = image.order;
+
+        // 새로운 order 값으로 이미지 배열 업데이트
+        const newImages = clothesImages.map((img, idx) => {
+            if (idx === index) {
+                return { ...img, order: newOrder };
+            }
+            return img;
+        });
+        setClothesImages(newImages);
+
+        // 서버에 변경된 순서를 PUT 요청으로 전송
+        try {
+            const response = await axios.put(`${process.env.REACT_APP_API_URL}/clothes_images/${image.clothesId}/${oldOrder}/${newOrder}`);
+            console.log('Order update response:', response.data);
+            // 성공적으로 업데이트가 완료되면 사용자에게 알림
+            alert('이미지 순서가 변경되었습니다.');
+        } catch (error) {
+            console.error('Order update error:', error);
+            // 실패할 경우 사용자에게 알림
+            alert('이미지 순서 변경에 실패했습니다.');
+            // 실패 시 상태를 원래대로 복원
+            setClothesImages(clothesImages);
+        }
+    };
+
+
+    // const handleRemoveImage = async (index) => {
+    //     const image = clothesImages[index];
+    //     if (!image || !image.imageUrl) return;
+
+    //     const storage = getStorage();
+    //     // Firebase Storage 내 파일 참조 생성
+    //     const imageRef = ref(storage, image.imageUrl);
+
+    //     try {
+    //         // Firebase Storage에서 이미지 삭제
+    //         await deleteObject(imageRef);
+    //         console.log("Image deleted successfully from Firebase Storage");
+
+    //         // 성공적으로 이미지를 삭제한 후, 데이터베이스에서 이미지 정보 삭제 요청
+    //         await axios.delete(`http://localhost:8080/clothes_images/${image.clothesId}/${encodeURIComponent(image.imageUrl)}`);
+    //         console.log("Image record deleted successfully from the database");
+
+    //         // 클라이언트 상태 업데이트 및 order 재조정
+    //         const updatedImages = clothesImages.filter((_, idx) => idx !== index).map((img, idx) => ({
+    //             ...img,
+    //             order: idx + 1  // 새로운 order 값 할당
+    //         }));
+    //         setClothesImages(updatedImages);
+
+    //         // 서버에 order 업데이트 요청
+    //         await axios.put(`http://localhost:8080/clothes_images/update_order/${image.clothesId}`, {
+    //             images: updatedImages
+    //         });
+    //         console.log("Order updated successfully on the database");
+
+    //     } catch (error) {
+    //         console.error("Error removing image: ", error);
+    //     }
+    // };
+    const handleRemoveImage = async (index) => {
+        const image = clothesImages[index];
+        if (!image || !image.imageUrl) return;
+
+        const storage = getStorage();
+        // Firebase Storage 내 파일 참조 생성
+        const imageRef = ref(storage, image.imageUrl);
+
+        try {
+            // Firebase Storage에서 이미지 삭제
+            await deleteObject(imageRef);
+            console.log("Image deleted successfully from Firebase Storage");
+
+            // 성공적으로 이미지를 삭제한 후, 데이터베이스에서 이미지 정보 삭제 요청
+            await axios.delete(`${process.env.REACT_APP_API_URL}/clothes_images/${image.clothesId}/${image.order}`)
+                .then(() => {
+                    console.log("Image record deleted successfully from the database");
+                    axios.get(`${process.env.REACT_APP_API_URL}/clothes_images/${image.clothesId}`)
+                        .then((result) => {
+                            setClothesImages(result.data);
+                            alert('이미지 제거 완료');
+                        })
+                        .catch(() => {
+                            console.log("이미지 불러오기 실패");
+                        })
+                })
+
+            // 클라이언트 상태 업데이트 및 order 재조정
+            // const updatedImages = clothesImages.filter((_, idx) => idx !== index).map((img, idx) => ({
+            //     ...img,
+            //     order: idx + 1  // 새로운 order 값 할당
+            // }));
+            // setClothesImages(updatedImages);
+
+
+
+            // 서버에 order 업데이트 요청
+            // await axios.put(`http://localhost:8080/clothes_images/update_order/${image.clothesId}`, {
+            //     images: updatedImages
+            // });
+            // console.log("Order updated successfully on the database");
+
+        } catch (error) {
+            console.error("Error removing image: ", error);
+        }
+    };
+
+    // dd
+
+
+
 
     return (
 
@@ -260,7 +517,7 @@ function ProductEdit(props) {
 
             <Container>
                 <Row>
-                    <Col> <h1 style={{ fontSize: '30px', fontWeight: '700', marginBottom: '30px', textAlign: 'center' }}>상품 신규 등록</h1></Col>
+                    <Col> <h1 style={{ fontSize: '30px', fontWeight: '700', marginBottom: '30px', textAlign: 'center' }}>상품 수정</h1></Col>
                 </Row>
                 <Row className="mb-3">
                     <Form.Group as={Row} controlId="formProductName">
@@ -385,7 +642,7 @@ function ProductEdit(props) {
                         </Col>
                         <Col md={1} className="align-self-center" style={{ marginTop: '30px' }}>
                             {productDetails.length > 1 && (
-                                <Button variant="danger" onClick={() => handleRemoveProductDetail(index)}>&#x2715;</Button>
+                                <Button variant="danger" onClick={() => handleRemoveProductDetail(index, productDetail)}>&#x2715;</Button>
                             )}
                         </Col>
                     </Row>
@@ -394,10 +651,49 @@ function ProductEdit(props) {
             ))}
             <br></br><br></br>
             <Container>
+                {/* <Row>
+=                    {thumbnailImage && (
+                        <Image src={thumbnailImage.imageUrl} rounded style={{ maxWidth: '100px', maxHeight: '100px' }} />
+                    )}
+                </Row>
+                
+=                    {additionalImages.map((image, index) => (
+                        <Row key={index} md={1}>
+                            <Image src={image.imageUrl} roundedCircle style={{ maxWidth: '100px', maxHeight: '100px' }} />
+                        </Row>
+                    ))} */}
                 <Row>
-                    <Col md={6}><label htmlFor="thumbnailImage" style={{ fontSize: '20px', fontWeight: '600', marginBottom: '5px' }}>썸네일 이미지 등록</label>
-                        <input type="file" className="form-control" id="thumbnailImage" /></Col>
-                    <Col md={6}><label htmlFor="additionalImages" style={{ fontSize: '20px', fontWeight: '600', marginBottom: '5px' }}>추가 이미지 등록</label>
+                    {clothesImages.map((image, index) => (
+                        <Container key={index} className="mb-3">
+                            <Row>
+                                <Col md={4}>
+                                    <Image src={image.imageUrl} rounded style={{ maxWidth: '100px', maxHeight: '100px' }} />
+                                </Col>
+                                <Col md={4}>
+                                    <Form.Group controlId={`imageOrder-${index}`}>
+                                        <Form.Label>순서</Form.Label>
+                                        <Form.Control
+                                            type="number"
+                                            name="order"
+                                            value={image.order}
+                                            onChange={(e) => handleImageOrderChange(e, index)}
+                                        />
+                                    </Form.Group>
+                                </Col>
+                                <Col md={3} className="align-self-center">
+                                    <Button variant="danger" onClick={() => handleRemoveImage(index)}>&#x2715; 제거</Button>
+                                </Col>
+                            </Row>
+                        </Container>
+                    ))}
+                </Row>
+
+
+
+                <Row>
+                    {/* <Col md={6}><label htmlFor="thumbnailImage" style={{ fontSize: '20px', fontWeight: '600', marginBottom: '5px' }}>썸네일 이미지 등록</label>
+                        <input type="file" className="form-control" id="thumbnailImage" /></Col> */}
+                    <Col md={12}><label htmlFor="additionalImages" style={{ fontSize: '20px', fontWeight: '600', marginBottom: '5px' }}>추가 이미지 등록</label>
                         <input type="file" className="form-control" id="additionalImages" multiple /></Col>
                 </Row>
                 <Row>
@@ -413,9 +709,9 @@ function ProductEdit(props) {
                                         aria-hidden="true"
                                         style={{ marginRight: '5px' }}
                                     />
-                                    등록 중...
+                                    상품 수정 중...
                                 </span>
-                            ) : '상품 등록하기'}
+                            ) : '상품 수정하기'}
                         </StyledButton>
                     </Col>
                 </Row>

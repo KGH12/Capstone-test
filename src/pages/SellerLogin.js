@@ -23,6 +23,13 @@ function SellerLogin(props) {
 
     let navigate = useNavigate();
 
+    // Redirect if already logged in
+    useEffect(() => {
+        if (isLoggedIn) {
+            navigate('/seller/statisticsanalysis');
+        }
+    }, [isLoggedIn, navigate]);
+
     useEffect(() => {
         let savedSellerEmail = localStorage.getItem('sellerEmail');
         let savedRememberMe = localStorage.getItem('sellerRememberMe');
@@ -79,6 +86,10 @@ function SellerLogin(props) {
                         localStorage.setItem('sellerRememberMe', 'false');
                     }
 
+                    const now = new Date().getTime(); // 현재 시간을 밀리초로 저장
+                    localStorage.setItem('sellerLoginTime', now); // 로그인 시간 저장
+                    localStorage.setItem('sellerIsLoggedIn', 'true');
+                    localStorage.setItem('sellerData', JSON.stringify(email));
                     dispatch(sellerLogin({ 'email_id': email }));
 
                     alert('로그인 성공');
@@ -138,10 +149,10 @@ function SellerLogin(props) {
 
 
     return (
-        <div style={{ 
-            display: 'flex', 
-            justifyContent: 'center', 
-            alignItems: 'center', 
+        <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
             // height: '100vh', 
             // marginTop: '-50px'  // Navbar의 영향을 받는 경우 조정
         }}>

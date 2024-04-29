@@ -22,6 +22,14 @@ function Login(props) {
 
   let navigate = useNavigate();
 
+  // 로그인 상태라면 메인화면으로 이동.
+  useEffect(() => {
+    if (isLoggedIn) {
+      navigate('/');
+    }
+  }, [isLoggedIn, navigate]);
+
+
   useEffect(() => {
     let savedUserEmail = localStorage.getItem('userEmail');
     let savedRememberMe = localStorage.getItem('rememberMe');
@@ -77,6 +85,12 @@ function Login(props) {
             localStorage.setItem('userEmail', '');
             localStorage.setItem('rememberMe', 'false');
           }
+
+          // localstorage에 로그인 정보 저장.
+          const now = new Date().getTime(); // 현재 시간을 밀리초로 저장
+          localStorage.setItem('userLoginTime', now); // 로그인 시간 저장
+          localStorage.setItem('userIsLoggedIn', 'true');
+          localStorage.setItem('userData', JSON.stringify(email));
 
           dispatch(login({ 'email_id': email }));
 

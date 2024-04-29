@@ -8,7 +8,7 @@ import ProductRegistration from "./pages/ProductRegistration.js";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import { useDispatch, useSelector } from "react-redux";
-import { logout } from "./store/userSlice.js";
+import { login, logout, setUserLoginState } from "./store/userSlice.js";
 import Badge from 'react-bootstrap/Badge';
 import { FaShoppingCart } from 'react-icons/fa';
 import { BsCart2 } from "react-icons/bs";
@@ -21,6 +21,8 @@ import ProductList from "./pages/ProductList.js";
 import OrderManagement from "./pages/OrderManagement.js";
 import StatisticsAnalysis from "./pages/StatisticsAnalysis.js";
 import SellerJoin from "./pages/SellerJoin.js";
+import { sellerLogin } from "./store/sellerSlice.js";
+import Checkout from "./pages/Checkout.js";
 
 const DeleteCustomer = lazy(() => import("./pages/DeleteCustomer.js"));
 const Main = lazy(() => import("./pages/Main.js"));
@@ -38,6 +40,40 @@ const Detail = lazy(() => import('./pages/Detail.js'));
 
 function App() {
 
+  useEffect(() => {
+    const updateLastAccessTime = (role) => {
+      const currentTime = new Date().getTime();
+      localStorage.setItem(`${role}LoginTime`, currentTime);
+    };
+
+    const checkAndUpdateLoginTime = () => {
+      const isUserLoggedIn = localStorage.getItem('userIsLoggedIn') === 'true';
+      const isSellerLoggedIn = localStorage.getItem('sellerIsLoggedIn') === 'true';
+
+      if (isUserLoggedIn) {
+        updateLastAccessTime('user');
+      }
+      if (isSellerLoggedIn) {
+        updateLastAccessTime('seller');
+      }
+    };
+
+    // 페이지가 닫힐 때와 탭이 백그라운드로 이동할 때 최종 접속 시간을 업데이트
+    window.addEventListener('beforeunload', checkAndUpdateLoginTime);
+    window.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') {
+        checkAndUpdateLoginTime();
+      }
+    });
+
+    // 컴포넌트 언마운트 시 이벤트 리스너 제거
+    return () => {
+      window.removeEventListener('beforeunload', checkAndUpdateLoginTime);
+      window.removeEventListener('visibilitychange', checkAndUpdateLoginTime);
+    };
+  }, []); // 빈 의존성 배열을 사용하여 컴포넌트 마운트와 언마운트 시에만 실행
+
+
   return (
     <div>
 
@@ -48,6 +84,7 @@ function App() {
 
             <Route index element={<Main />} />
             <Route path="/detail/:clothesId" element={<Detail />} />
+            <Route path="/checkout" element={<Checkout />} />
             <Route path="*" element={<div>없는 페이지입니다.</div>} />
             <Route path="/about" element={<About />} >
               <Route path="member" element={<div> 멤버 페이지입니다. </div>} />
