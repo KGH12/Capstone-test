@@ -54,6 +54,7 @@ function CardItem(props) {
             height: "200px", // 고정된 높이 설정
             objectFit: "cover" // 이미지가 비율을 유지하며 지정된 영역을 채우도록 함
           }}
+          loading="lazy"
         />
 
         <Card.Body>
@@ -62,7 +63,7 @@ function CardItem(props) {
             {props.products.detail}
           </Card.Text>
           <Card.Text>
-            {props.products.price}원
+            {props.products.price.toLocaleString()}원
           </Card.Text>
         </Card.Body>
       </Card>

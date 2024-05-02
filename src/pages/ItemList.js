@@ -43,6 +43,7 @@ function ItemList(props) {
   //     setProducts(data); // 상품 데이터를 상태에 저장
   //   });
   // }, [category, major, minor]); // 의존성 배열에 매개변수들을 포함시켜, 이들이 변할 때마다 useEffect가 실행되도록 합니다.
+  
   useEffect(() => {
     fetchProducts({ category, major, minor })
       .then(data => {

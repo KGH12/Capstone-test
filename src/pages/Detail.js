@@ -496,7 +496,7 @@ function TabContent({ tab, imgUrls, clothesId }) {
                 <Col md={{ offset: 2, span: 8 }} xs={12}>
                     <img key={index} src={img.imageUrl} alt={`Clothes Image ${index + 1}`}
                         style={{ width: '100%', marginBottom: '10px', display: 'block', marginLeft: 'auto', marginRight: 'auto' }}
-                    />
+                    loading='lazy'/>
                 </Col>
             </Row >
 

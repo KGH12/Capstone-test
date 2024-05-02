@@ -23,6 +23,10 @@ import StatisticsAnalysis from "./pages/StatisticsAnalysis.js";
 import SellerJoin from "./pages/SellerJoin.js";
 import { sellerLogin } from "./store/sellerSlice.js";
 import Checkout from "./pages/Checkout.js";
+import OrderComplete from "./pages/OrderComplete.js";
+import SearchResults from "./pages/SearchResults.js";
+import OrderDeliveryStatus from "./pages/OrderDeliveryStatus.js";
+import OrderDetails from "./pages/OrderDetails.js";
 
 const DeleteCustomer = lazy(() => import("./pages/DeleteCustomer.js"));
 const Main = lazy(() => import("./pages/Main.js"));
@@ -85,6 +89,8 @@ function App() {
             <Route index element={<Main />} />
             <Route path="/detail/:clothesId" element={<Detail />} />
             <Route path="/checkout" element={<Checkout />} />
+            <Route path="search/:query" element={<SearchResults />} />
+            <Route path="/ordercomplete" element={<OrderComplete />} />
             <Route path="*" element={<div>없는 페이지입니다.</div>} />
             <Route path="/about" element={<About />} >
               <Route path="member" element={<div> 멤버 페이지입니다. </div>} />
@@ -99,14 +105,15 @@ function App() {
             <Route path="/cart" element={<Cart />} />
             <Route path="/login" element={<Login />} />
             <Route path="/Join" element={<Join />} />
-
             <Route path="/ProductEdit" element={<ProductEdit />} />
+          
             <Route path="/mypage" element={<Mypage />} >
+              <Route path="orderdeliverystatus" element={<OrderDeliveryStatus />} />
+              <Route path="orderdeliverystatus/orderdetails/:receiptId" element={<OrderDetails />} />
               <Route path="deleteCustomer" element={<DeleteCustomer />} />
               <Route path="updateCustomer" element={<UpdateCustomer />} />
               <Route path="PwConfirm" element={<PwConfirm />} />
             </Route>
-
           </Route>
 
           <Route path="/seller" element={<SellerLayout />}>

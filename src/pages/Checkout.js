@@ -120,47 +120,59 @@ function Checkout(props) {
             customerEmail: userInfo.email_id,
             status: 0  // '0'이 '생성 중' 상태를 의미
         })
-        .then(response1 => {
-            const receiptId = response1.data.receiptId;
-    
-            items.forEach(item => {
-                axios.post(`${process.env.REACT_APP_API_URL}/receipt_detail`, {
-                    receiptId: receiptId,
-                    detailId: item.detailId,
-                    quantity: item.quantity
-                })
-                .then(response2 => {
-                    console.log(`영수증 세부정보 생성 완료: ${response2.data.detailId}`);
-                    // 여기서 root 속성 체크
-                    if (item.root === 'cart') {
-                        removeItemFromCart(userInfo.email_id, item.detailId);  // 구매한 상품을 장바구니에서 삭제
-                    }
-                })
-                .catch(error => {
-                    console.error('영수증 세부정보 생성 실패', error);
+            .then(response1 => {
+                const receiptId = response1.data.receiptId;
+
+                items.forEach(item => {
+                    axios.post(`${process.env.REACT_APP_API_URL}/receipt_detail`, {
+                        receiptId: receiptId,
+                        detailId: item.detailId,
+                        quantity: item.quantity
+                    })
+                        .then(response2 => {
+                            console.log(`영수증 세부정보 생성 완료: ${response2.data.detailId}`);
+                            // 여기서 root 속성 체크
+                            if (item.root === 'cart') {
+                                removeItemFromCart(userInfo.email_id, item.detailId);  // 구매한 상품을 장바구니에서 삭제
+                            }
+                        })
+                        .catch(error => {
+                            console.error('영수증 세부정보 생성 실패', error);
+                        });
                 });
+
+                // alert('구매가 완료되었습니다!');
+                // window.location.assign('/');
+                // navigate('/');
+
+                // 네비게이션 이동 및 주문 정보 전달
+                navigate('/ordercomplete', {
+                    state: {
+                        address: address,
+                        detailAddress: detailAddress,
+                        orderNumber: receiptId,
+                        amount: totalAmount,
+                        items: items
+                    }
+                });
+
+            })
+            .catch(error => {
+                console.error('영수증 생성 실패', error);
             });
-    
-            alert('구매가 완료되었습니다!');
-            window.location.assign('/');
-            // navigate('/');
-        })
-        .catch(error => {
-            console.error('영수증 생성 실패', error);
-        });
-    };
-    
-    const removeItemFromCart = (email, detailId) => {
-        axios.delete(`${process.env.REACT_APP_API_URL}/cart/${email}/${detailId}`)
-        .then(response => {
-            console.log(`장바구니에서 상품 제거 성공: ${detailId}`);
-        })
-        .catch(error => {
-            console.error(`장바구니에서 상품 제거 실패: ${detailId}`, error);
-        });
     };
 
-    
+    const removeItemFromCart = (email, detailId) => {
+        axios.delete(`${process.env.REACT_APP_API_URL}/cart/${email}/${detailId}`)
+            .then(response => {
+                console.log(`장바구니에서 상품 제거 성공: ${detailId}`);
+            })
+            .catch(error => {
+                console.error(`장바구니에서 상품 제거 실패: ${detailId}`, error);
+            });
+    };
+
+
 
     const totalAmount = items.reduce((acc, item) => acc + (item.clothes.price * item.quantity), 0);
 
@@ -189,7 +201,12 @@ function Checkout(props) {
 
     }, [navigate, isLoggedIn, userInfo]);
 
-
+    // 아이템 없이 구매화면 들어오면 홈으로 이동
+    useEffect(() => {
+        if (items.length === 0) {
+            navigate('/');
+        }
+    }, [navigate, items]);
 
     return (
         <Container>
@@ -313,7 +330,9 @@ function Checkout(props) {
             </Row>
 
             <Row>
-                <Col md={{ span: 2, offset: 1 }} xs={12}> <h1 style={{ fontSize: '20px', fontWeight: '700', marginBottom: '30px', marginTop: '30px', textAlign: 'left' }}>결제 수단</h1></Col>
+                <Col md={{ span: 2, offset: 1 }} xs={12}>
+                    <h1 style={{ fontSize: '20px', fontWeight: '700', marginBottom: '30px', marginTop: '30px', textAlign: 'left' }}>결제 수단</h1>
+                </Col>
             </Row>
             <Row>
                 <Col md={{ span: 5, offset: 1 }} xs={12}>

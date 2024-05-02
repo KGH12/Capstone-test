@@ -83,10 +83,17 @@ function UserLayout(props) {
     let { userInfo, isLoggedIn } = useSelector((state) => state.user);
     let cartItems = useSelector((state) => state.cart.items);
 
+    // let handleSearch = (e) => {
+    //     // 검색 로직을 추가하기
+    //     e.preventDefault();
+    //     console.log('검색 버튼이 클릭되었습니다.');
+    // };
     let handleSearch = (e) => {
-        // 검색 로직을 추가하기
         e.preventDefault();
-        console.log('검색 버튼이 클릭되었습니다.');
+        const searchQuery = e.target.elements.search.value; // Assuming the input field's name is 'search'
+        if (searchQuery.trim()) {
+            navigate(`/search/${searchQuery}`);
+        }
     };
 
 
@@ -122,12 +129,20 @@ function UserLayout(props) {
                                 S<span style={{ fontSize: '20px', fontWeight: '600' }}>tyle</span>
                             </Navbar.Brand>
                             <Form className="search-form d-flex flex-grow-1" onSubmit={handleSearch}>
+                                {/* <Form.Control
+                                    type="search"
+                                    placeholder="검색어를 입력하세요"
+                                    className="search-input me-2"
+                                    aria-label="Search"
+                                /> */}
                                 <Form.Control
                                     type="search"
                                     placeholder="검색어를 입력하세요"
                                     className="search-input me-2"
                                     aria-label="Search"
+                                    name="search"  // Name attribute to easily retrieve the input value
                                 />
+
                                 <Button type="submit" typevariant="outline-success" className="search-button">
                                     <FontAwesomeIcon icon={faMagnifyingGlass} />
                                 </Button>
@@ -162,7 +177,7 @@ function UserLayout(props) {
                                 </Nav.Link>
                                 <Nav.Link style={{ marginRight: '20px' }} onClick={() => {
                                     if (isLoggedIn) {
-                                        navigate('/mypage')
+                                        navigate('/mypage/orderdeliverystatus')
                                     } else {
                                         alert('로그인 후 이용해주세요.');
                                         navigate('/login');
