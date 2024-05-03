@@ -43,7 +43,7 @@ function OrderDeliveryStatus(props) {
     useEffect(() => {
         const fetchOrders = async () => {
             try {
-                const response = await axios.get(`http://localhost:8080/receipt/${userInfo.email_id}`);
+                const response = await axios.get(`${process.env.REACT_APP_API_URL}/receipt/${userInfo.email_id}`);
                 const sortedData = response.data.sort((a, b) => new Date(b.date) - new Date(a.date)); // 최신 날짜부터 정렬
                 setOrders(sortedData);
             } catch (error) {
