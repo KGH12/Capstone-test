@@ -179,7 +179,7 @@ function ProductRegistration() {
             });
 
             console.log('Category Response:', categoryResponse.data);
-           
+
             // 상품의 category 등록에 성공한 후, 각 detail 등록
             for (let detail of productDetails) {
                 // // 이미지 URL을 detail 객체에 추가
@@ -231,11 +231,15 @@ function ProductRegistration() {
     return (
 
         <form onSubmit={handleSubmit}>
-            <br />
+           
 
             <Container>
                 <Row>
-                    <Col> <h1 style={{ fontSize: '30px', fontWeight: '700', marginBottom: '30px', textAlign: 'center' }}>상품 신규 등록</h1></Col>
+                    <Col>
+                        <br /> <br />
+                        <h1 style={{ fontSize: '30px', fontWeight: '700' }}>상품 신규 등록</h1>
+                        <br /><br />
+                    </Col>
                 </Row>
                 <Row className="mb-3">
                     <Form.Group as={Row} controlId="formProductName">

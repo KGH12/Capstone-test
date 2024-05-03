@@ -15,20 +15,36 @@ function Mypage(props) {
   let dispatch = useDispatch();
   let navigate = useNavigate();
   let location = useLocation();
-  let { userInfo, isLoggedIn, isPwConfirm } = useSelector((state) => state.user);
+  let { userInfo, isLoggedIn, isPwConfirm, isLoading } = useSelector((state) => state.user);
   // let [currentPage, setCurrentPage] = useState('주문/배송 조회'); // 초기 페이지 설정
 
 
   // 로그인하지 않은 상태라면 로그인 페이지로 리디렉션
+  // useEffect(() => {
+  //   if (!isLoggedIn || !userInfo) {
+  //     return; // 로그인 상태나 sellerInfo가 유효하지 않은 경우 early return을 사용
+  //   }
+  //   if (!isLoggedIn || !userInfo) {
+  //     alert('로그인 후 이용해주세요.');
+  //     navigate('/login'); // 로그인 페이지로 리디렉션
+  //   }
+  // }, [isLoggedIn, userInfo, navigate]);
+
+
+  // useEffect(() => {
+  //   if (!isLoggedIn) {
+  //     alert('로그인 후 이용해주세요.');
+  //     navigate('/login'); // 로그인 페이지로 리디렉션
+  //   }
+  // }, [isLoggedIn, navigate]);
+
   useEffect(() => {
-    if (!isLoggedIn || !userInfo) {
-      return; // 로그인 상태나 sellerInfo가 유효하지 않은 경우 early return을 사용
-    }
-    if (!isLoggedIn || !userInfo) {
+    if (!isLoading && !isLoggedIn) {
       alert('로그인 후 이용해주세요.');
-      navigate('/login'); // 로그인 페이지로 리디렉션
+      navigate('/login');
     }
-  }, [isLoggedIn, userInfo, navigate]);
+  }, [isLoggedIn, isLoading, navigate]);
+
 
 
   // mypage 루트에 접속했을 때만 OrderDeliveryStatus로 리디렉션

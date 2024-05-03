@@ -8,7 +8,7 @@ import ProductRegistration from "./pages/ProductRegistration.js";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import { useDispatch, useSelector } from "react-redux";
-import { login, logout, setUserLoginState } from "./store/userSlice.js";
+import { login, logout, setUserLoading, setUserLoginState } from "./store/userSlice.js";
 import Badge from 'react-bootstrap/Badge';
 import { FaShoppingCart } from 'react-icons/fa';
 import { BsCart2 } from "react-icons/bs";
@@ -21,12 +21,14 @@ import ProductList from "./pages/ProductList.js";
 import OrderManagement from "./pages/OrderManagement.js";
 import StatisticsAnalysis from "./pages/StatisticsAnalysis.js";
 import SellerJoin from "./pages/SellerJoin.js";
-import { sellerLogin } from "./store/sellerSlice.js";
+import { sellerLogin, sellerLogout, setSellerLoading } from "./store/sellerSlice.js";
 import Checkout from "./pages/Checkout.js";
 import OrderComplete from "./pages/OrderComplete.js";
 import SearchResults from "./pages/SearchResults.js";
 import OrderDeliveryStatus from "./pages/OrderDeliveryStatus.js";
 import OrderDetails from "./pages/OrderDetails.js";
+import ProtectedRoute from "./pages/ProtectedRoute.js";
+import ProtectedRouteSeller from "./pages/ProtectedRouteSeller.js";
 
 const DeleteCustomer = lazy(() => import("./pages/DeleteCustomer.js"));
 const Main = lazy(() => import("./pages/Main.js"));
@@ -43,6 +45,68 @@ const Detail = lazy(() => import('./pages/Detail.js'));
 
 
 function App() {
+
+  let navigate = useNavigate();
+  let dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(setUserLoading(true));
+    const userIsLoggedIn = localStorage.getItem('userIsLoggedIn') === 'true';
+    const loginTime = parseInt(localStorage.getItem('userLoginTime'), 10);
+    const now = new Date().getTime();
+    const expirationTime = 60 * 60 * 1000; // 로그인 성공 후 1시간 지났으면 로그아웃
+    // const expirationTime = 5 * 1000; // 테스트용, 로그인 후 5초 후 재접속 시 로그아웃
+    const userData = JSON.parse(localStorage.getItem('userData'));
+
+    if (userIsLoggedIn && (now - loginTime > expirationTime)) {
+      // 로그인 시간이 유효 기간을 초과했을 경우 로그아웃 처리
+      localStorage.removeItem('userIsLoggedIn');
+      localStorage.removeItem('userLoginTime');
+      localStorage.removeItem('userData');
+      dispatch(logout()); // Redux 상태 업데이트
+      alert('로그인 세션이 만료되었습니다. 다시 로그인 해주세요.');
+      return;
+    }
+
+    if (userIsLoggedIn && userData) {
+      dispatch(login({ 'email_id': userData }));
+    } else {
+      dispatch(logout());
+    }
+  }, [dispatch]);
+
+
+  useEffect(() => {
+    dispatch(setSellerLoading(true));
+    const sellerIsLoggedIn = localStorage.getItem('sellerIsLoggedIn') === 'true';
+    const loginTime = parseInt(localStorage.getItem('sellerLoginTime'), 10);
+    const now = new Date().getTime();
+    const expirationTime = 60 * 60 * 1000; // 로그인 성공 후 1시간 지났으면 로그아웃
+    // const expirationTime = 5 * 1000; // 테스트용, 로그인 후 5초 후 재접속 시 로그아웃
+    const sellerData = JSON.parse(localStorage.getItem('sellerData'));
+
+    if (sellerIsLoggedIn && (now - loginTime > expirationTime)) {
+      // 로그인 시간이 유효 기간을 초과했을 경우 로그아웃 처리
+      localStorage.removeItem('sellerIsLoggedIn');
+      localStorage.removeItem('sellerLoginTime');
+      localStorage.removeItem('sellerData');
+      dispatch(sellerLogout()); // Redux 상태 업데이트
+      alert('로그인 세션이 만료되었습니다. 다시 로그인 해주세요.');
+      navigate('/seller/login');
+      return;
+    }
+
+    if (sellerIsLoggedIn && sellerData) {
+      dispatch(sellerLogin({ 'email_id': sellerData }));
+    } else {
+      dispatch(sellerLogout());
+    }
+    // setLoading(false);  // 로딩 상태 업데이트
+  }, [dispatch]);
+
+
+
+
 
   useEffect(() => {
     const updateLastAccessTime = (role) => {
@@ -106,8 +170,9 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/Join" element={<Join />} />
             <Route path="/ProductEdit" element={<ProductEdit />} />
-          
-            <Route path="/mypage" element={<Mypage />} >
+
+            {/* <Route path="/mypage" element={<Mypage />} > */}
+            <Route path="/mypage" element={<ProtectedRoute><Mypage /></ProtectedRoute>}>
               <Route path="orderdeliverystatus" element={<OrderDeliveryStatus />} />
               <Route path="orderdeliverystatus/orderdetails/:receiptId" element={<OrderDetails />} />
               <Route path="deleteCustomer" element={<DeleteCustomer />} />
@@ -121,11 +186,12 @@ function App() {
             <Route path="*" element={<div>없는 페이지입니다.</div>} />
             <Route path="sellerjoin" element={<SellerJoin />} />
             {/* <Route path="dashboard" element={<Dashboard />} /> */}
-            <Route path="ProductRegistration" element={<ProductRegistration />} />
-            <Route path="productlist" element={<ProductList />} />
-            <Route path="productedit/:editid" element={<ProductEdit />} />
-            <Route path="ordermanagement" element={<OrderManagement />} />
-            <Route path="statisticsanalysis" element={<StatisticsAnalysis />} />
+            <Route path="ProductRegistration" element={<ProtectedRouteSeller><ProductRegistration /></ProtectedRouteSeller>} />
+            <Route path="productlist" element={<ProtectedRouteSeller><ProductList /></ProtectedRouteSeller>} />
+            <Route path="productedit/:editid" element={<ProtectedRouteSeller><ProductEdit /></ProtectedRouteSeller>} />
+            {/* <Route path="/seller/ordermanagement/orderdetailsseller/:receiptId" element={<ProtectedRouteSeller><OrderDetailsSeller /></ProtectedRouteSeller>} /> */}
+            <Route path="ordermanagement" element={<ProtectedRouteSeller><OrderManagement /></ProtectedRouteSeller>} />
+            <Route path="statisticsanalysis" element={<ProtectedRouteSeller><StatisticsAnalysis /></ProtectedRouteSeller>} />
           </Route>
         </Routes>
       </Suspense>

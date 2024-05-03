@@ -7,7 +7,7 @@ import axios from 'axios';
 
 function OrderDeliveryStatus(props) {
     let navigate = useNavigate();
-    let { userInfo, isLoggedIn } = useSelector((state) => state.user);
+    let { userInfo, isLoggedIn, isLoading } = useSelector((state) => state.user);
     const [orders, setOrders] = useState([]);
 
     // 주문 상태 코드를 문자열로 매핑
@@ -20,15 +20,25 @@ function OrderDeliveryStatus(props) {
         5: "반품 완료"
     };
 
+    // useEffect(() => {
+    //     if (!isLoggedIn || !userInfo) {
+    //         return; // 로그인 상태나 userInfo가 유효하지 않은 경우 early return을 사용
+    //     }
+    //     if (!isLoggedIn) {
+    //         alert('로그인 후 이용해주세요.');
+    //         navigate('/login');
+    //     }
+    // }, [isLoggedIn, userInfo, navigate]);
+
     useEffect(() => {
-        if (!isLoggedIn || !userInfo) {
-            return; // 로그인 상태나 userInfo가 유효하지 않은 경우 early return을 사용
-        }
-        if (!isLoggedIn) {
+        if (!isLoading && !isLoggedIn) {
             alert('로그인 후 이용해주세요.');
             navigate('/login');
         }
-    }, [isLoggedIn, userInfo, navigate]);
+    }, [isLoggedIn, isLoading, navigate]);
+
+
+
 
     useEffect(() => {
         const fetchOrders = async () => {
@@ -49,9 +59,10 @@ function OrderDeliveryStatus(props) {
 
 
     const handleViewDetails = (receiptId, date, status) => {
-        navigate(`orderdetails/${receiptId}`, {
-            state: { date: date, status: status } // 여기에 필요한 정보를 넣어서 전달합니다.
-        });
+        // navigate(`orderdetails/${receiptId}`, {
+        //     state: { date: date, status: status } // 여기에 필요한 정보를 넣어서 전달합니다.
+        // });
+        navigate(`orderdetails/${receiptId}`);
     };
 
 

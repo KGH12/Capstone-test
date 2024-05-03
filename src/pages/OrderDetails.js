@@ -28,7 +28,10 @@ let StyledButton = styled.button`
 function OrderDetails() {
     const navigate = useNavigate();
     const location = useLocation();
-    const { date, status } = location.state; // 넘어온 데이터 사용
+    const queryParams = new URLSearchParams(location.search);
+    const date = queryParams.get('date');
+    const status = parseInt(queryParams.get('status'), 10);
+    // const { date, status } = location.state; // 넘어온 데이터 사용
     const { receiptId } = useParams();
     const [orderDetails, setOrderDetails] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -39,10 +42,10 @@ function OrderDetails() {
     useEffect(() => {
         const fetchOrderDetails = async () => {
             try {
-                const orderResponse = await axios.get(`http://localhost:8080/receipt_detail/${receiptId}`);
+                const orderResponse = await axios.get(`${process.env.REACT_APP_API_URL}/receipt_detail/${receiptId}`);
                 setOrderDetails(orderResponse.data);
 
-                const customerResponse = await axios.get(`http://localhost:8080/customers/${orderResponse.data[0].customerEmail}`);
+                const customerResponse = await axios.get(`${process.env.REACT_APP_API_URL}/customers/${orderResponse.data[0].customerEmail}`);
                 setCustomerDetails(customerResponse.data);
 
                 // 총액 계산
@@ -67,7 +70,7 @@ function OrderDetails() {
         } else {
             try {
                 // API로 상태 업데이트 요청
-                axios.put(`http://localhost:8080/receipt/${receiptId}/4`)
+                axios.put(`${process.env.REACT_APP_API_URL}/receipt/${receiptId}/4`)
                     .then(() => {
                         alert('반품 신청이 완료되었습니다.');
                         navigate('/mypage/orderdeliverystatus');

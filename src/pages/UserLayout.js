@@ -3,7 +3,7 @@ import '../App.css';
 import { Routes, Route, useNavigate, Outlet, Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
-import { login, logout } from "../store/userSlice.js";
+import { login, logout, setUserLoading } from "../store/userSlice.js";
 import Badge from 'react-bootstrap/Badge';
 import { FaShoppingCart } from 'react-icons/fa';
 import { FaUser } from "react-icons/fa";
@@ -42,40 +42,41 @@ function UserLayout(props) {
 
     const dispatch = useDispatch();
 
-    useEffect(() => {
-        const userIsLoggedIn = localStorage.getItem('userIsLoggedIn') === 'true';
-        const loginTime = parseInt(localStorage.getItem('userLoginTime'), 10);
-        const now = new Date().getTime();
-        const expirationTime = 60 * 60 * 1000; // 로그인 성공 후 1시간 지났으면 로그아웃
-        // const expirationTime = 5 * 1000; // 테스트용, 로그인 후 5초 후 재접속 시 로그아웃
-        const userData = JSON.parse(localStorage.getItem('userData'));
+    // useEffect(() => {
+    //     dispatch(setUserLoading(true));
+    //     const userIsLoggedIn = localStorage.getItem('userIsLoggedIn') === 'true';
+    //     const loginTime = parseInt(localStorage.getItem('userLoginTime'), 10);
+    //     const now = new Date().getTime();
+    //     const expirationTime = 60 * 60 * 1000; // 로그인 성공 후 1시간 지났으면 로그아웃
+    //     // const expirationTime = 5 * 1000; // 테스트용, 로그인 후 5초 후 재접속 시 로그아웃
+    //     const userData = JSON.parse(localStorage.getItem('userData'));
 
-        if (userIsLoggedIn && (now - loginTime > expirationTime)) {
-            // 로그인 시간이 유효 기간을 초과했을 경우 로그아웃 처리
-            localStorage.removeItem('userIsLoggedIn');
-            localStorage.removeItem('userLoginTime');
-            localStorage.removeItem('userData');
-            dispatch(logout()); // Redux 상태 업데이트
-            alert('로그인 세션이 만료되었습니다. 다시 로그인 해주세요.');
-            return;
-        }
+    //     if (userIsLoggedIn && (now - loginTime > expirationTime)) {
+    //         // 로그인 시간이 유효 기간을 초과했을 경우 로그아웃 처리
+    //         localStorage.removeItem('userIsLoggedIn');
+    //         localStorage.removeItem('userLoginTime');
+    //         localStorage.removeItem('userData');
+    //         dispatch(logout()); // Redux 상태 업데이트
+    //         alert('로그인 세션이 만료되었습니다. 다시 로그인 해주세요.');
+    //         return;
+    //     }
 
-        if (userIsLoggedIn && userData) {
-            dispatch(login({ 'email_id': userData }));
-        }
-    }, [dispatch]);
+    //     if (userIsLoggedIn && userData) {
+    //         dispatch(login({ 'email_id': userData }));
+    //     }
+    // }, [dispatch]);
 
-    // 최근 본 상품 초기화
-    useEffect(() => {
-        let a = JSON.parse(localStorage.getItem('watched'))
+    // // 최근 본 상품 초기화
+    // useEffect(() => {
+    //     let a = JSON.parse(localStorage.getItem('watched'))
 
-        if (a == null || a.length === 0) {
-            localStorage.setItem('watched', JSON.stringify([]))
-        }
+    //     if (a == null || a.length === 0) {
+    //         localStorage.setItem('watched', JSON.stringify([]))
+    //     }
 
-    }, [])
+    // }, [])
 
-    let recentItemId = JSON.parse(localStorage.getItem('watched'))
+    // let recentItemId = JSON.parse(localStorage.getItem('watched'))
 
 
     let navigate = useNavigate();
@@ -83,11 +84,6 @@ function UserLayout(props) {
     let { userInfo, isLoggedIn } = useSelector((state) => state.user);
     let cartItems = useSelector((state) => state.cart.items);
 
-    // let handleSearch = (e) => {
-    //     // 검색 로직을 추가하기
-    //     e.preventDefault();
-    //     console.log('검색 버튼이 클릭되었습니다.');
-    // };
     let handleSearch = (e) => {
         e.preventDefault();
         const searchQuery = e.target.elements.search.value; // Assuming the input field's name is 'search'
@@ -95,7 +91,6 @@ function UserLayout(props) {
             navigate(`/search/${searchQuery}`);
         }
     };
-
 
     // 장바구니 데이터 불러오기 (장바구니 개수)
     useEffect(() => {

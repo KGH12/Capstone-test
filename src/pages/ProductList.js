@@ -205,11 +205,12 @@ function ProductList(props) {
 
     return (
         <div>
-            <br /> <br />
+
 
             <Container>
                 <Row>
-                    <Col xs={{ span: 10, offset: 1 }} md={{ span: 10, offset: 1 }}>
+                    <Col>
+                        <br /> <br />
                         <h1 style={{ fontSize: '30px', fontWeight: '700' }}>등록 상품</h1>
                         <br /><br />
                     </Col>

@@ -68,30 +68,30 @@ function SellerLayout(props) {
     const toggleSidebar = () => setIsOpen(!isOpen);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        const sellerIsLoggedIn = localStorage.getItem('sellerIsLoggedIn') === 'true';
-        const loginTime = parseInt(localStorage.getItem('sellerLoginTime'), 10);
-        const now = new Date().getTime();
-        const expirationTime = 60 * 60 * 1000; // 로그인 성공 후 1시간 지났으면 로그아웃
-        // const expirationTime = 5 * 1000; // 테스트용, 로그인 후 5초 후 재접속 시 로그아웃
-        const sellerData = JSON.parse(localStorage.getItem('sellerData'));
+    // useEffect(() => {
+    //     const sellerIsLoggedIn = localStorage.getItem('sellerIsLoggedIn') === 'true';
+    //     const loginTime = parseInt(localStorage.getItem('sellerLoginTime'), 10);
+    //     const now = new Date().getTime();
+    //     const expirationTime = 60 * 60 * 1000; // 로그인 성공 후 1시간 지났으면 로그아웃
+    //     // const expirationTime = 5 * 1000; // 테스트용, 로그인 후 5초 후 재접속 시 로그아웃
+    //     const sellerData = JSON.parse(localStorage.getItem('sellerData'));
         
-        if (sellerIsLoggedIn && (now - loginTime > expirationTime)) {
-            // 로그인 시간이 유효 기간을 초과했을 경우 로그아웃 처리
-            localStorage.removeItem('sellerIsLoggedIn');
-            localStorage.removeItem('sellerLoginTime');
-            localStorage.removeItem('sellerData');
-            dispatch(sellerLogout()); // Redux 상태 업데이트
-            alert('로그인 세션이 만료되었습니다. 다시 로그인 해주세요.');
-            navigate('/seller/login');
-            return;
-        }
+    //     if (sellerIsLoggedIn && (now - loginTime > expirationTime)) {
+    //         // 로그인 시간이 유효 기간을 초과했을 경우 로그아웃 처리
+    //         localStorage.removeItem('sellerIsLoggedIn');
+    //         localStorage.removeItem('sellerLoginTime');
+    //         localStorage.removeItem('sellerData');
+    //         dispatch(sellerLogout()); // Redux 상태 업데이트
+    //         alert('로그인 세션이 만료되었습니다. 다시 로그인 해주세요.');
+    //         navigate('/seller/login');
+    //         return;
+    //     }
         
-        if (sellerIsLoggedIn && sellerData) {
-            dispatch(sellerLogin({ 'email_id': sellerData }));
-        }
-        setLoading(false);  // 로딩 상태 업데이트
-    }, [dispatch]);
+    //     if (sellerIsLoggedIn && sellerData) {
+    //         dispatch(sellerLogin({ 'email_id': sellerData }));
+    //     }
+    //     setLoading(false);  // 로딩 상태 업데이트
+    // }, [dispatch]);
     
 
     useEffect(() => {
