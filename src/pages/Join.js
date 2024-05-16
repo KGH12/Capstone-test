@@ -317,7 +317,7 @@ function Join(props) {
                     placeholder="0000"
                     className='login-InputPhone' />
                 </div>
-             
+
               </Form.Group>
 
 
@@ -345,6 +345,7 @@ function Join(props) {
                 <Form.Label className='login-InputTitle'>비밀번호</Form.Label>
                 <div className='login-InputWrap'>
                   <Form.Control
+                    style={{ fontFamily: 'serif' }}
                     value={pw}
                     onChange={handlePw}
                     type="password" placeholder="비밀번호를 입력하세요." className='login-Input' />
@@ -362,6 +363,7 @@ function Join(props) {
                 <Form.Label className='login-InputTitle'>비밀번호 확인</Form.Label>
                 <div className='login-InputWrap'>
                   <Form.Control
+                    style={{ fontFamily: 'serif' }}
                     value={pwConfirm}
                     onChange={handlePwConfirm}
                     type="password" placeholder="비밀번호를 입력하세요." className='login-Input' />

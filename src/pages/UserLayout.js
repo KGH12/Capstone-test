@@ -7,7 +7,7 @@ import { login, logout, setUserLoading } from "../store/userSlice.js";
 import Badge from 'react-bootstrap/Badge';
 import { FaShoppingCart } from 'react-icons/fa';
 import { FaUser } from "react-icons/fa";
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 import axios from 'axios';
@@ -26,8 +26,8 @@ const CartItemCount = styled.span`
   position: absolute;
   top: -8px; // 숫자의 위치를 조정하세요
   right: -24px; // 숫자의 위치를 조정하세요
-  background-color: #1263CE; // 배경색은 원하는 대로 설정
-  color: white; // 숫자 색상
+  background-color: #000000; // 배경색은 원하는 대로 설정
+  color: #ffffff; // 숫자 색상
   font-size: 14px; // 숫자 크기
   font-weight: 500;
   padding: 0px 15px; // 안쪽 여백
@@ -37,34 +37,14 @@ const CartItemCount = styled.span`
   align-items: center;
 `;
 
+const BrandLogo = styled.img`
+  max-height: 28px;
+  content: ${props => `url(${props.logo})`};
+`;
 
 function UserLayout(props) {
 
     const dispatch = useDispatch();
-
-    // useEffect(() => {
-    //     dispatch(setUserLoading(true));
-    //     const userIsLoggedIn = localStorage.getItem('userIsLoggedIn') === 'true';
-    //     const loginTime = parseInt(localStorage.getItem('userLoginTime'), 10);
-    //     const now = new Date().getTime();
-    //     const expirationTime = 60 * 60 * 1000; // 로그인 성공 후 1시간 지났으면 로그아웃
-    //     // const expirationTime = 5 * 1000; // 테스트용, 로그인 후 5초 후 재접속 시 로그아웃
-    //     const userData = JSON.parse(localStorage.getItem('userData'));
-
-    //     if (userIsLoggedIn && (now - loginTime > expirationTime)) {
-    //         // 로그인 시간이 유효 기간을 초과했을 경우 로그아웃 처리
-    //         localStorage.removeItem('userIsLoggedIn');
-    //         localStorage.removeItem('userLoginTime');
-    //         localStorage.removeItem('userData');
-    //         dispatch(logout()); // Redux 상태 업데이트
-    //         alert('로그인 세션이 만료되었습니다. 다시 로그인 해주세요.');
-    //         return;
-    //     }
-
-    //     if (userIsLoggedIn && userData) {
-    //         dispatch(login({ 'email_id': userData }));
-    //     }
-    // }, [dispatch]);
 
     // // 최근 본 상품 초기화
     // useEffect(() => {
@@ -83,6 +63,25 @@ function UserLayout(props) {
 
     let { userInfo, isLoggedIn } = useSelector((state) => state.user);
     let cartItems = useSelector((state) => state.cart.items);
+
+    const [logo, setLogo] = useState(`${process.env.PUBLIC_URL}/img/logo1.png`);
+
+    useEffect(() => {
+        const handleResize = () => {
+            if (window.innerWidth <= 768) {
+                setLogo(`${process.env.PUBLIC_URL}/img/logo3.png`);
+            } else {
+                setLogo(`${process.env.PUBLIC_URL}/img/logo1.png`);
+            }
+        };
+
+        window.addEventListener('resize', handleResize);
+        handleResize(); // Call it initially to set the right logo
+
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []);
 
     let handleSearch = (e) => {
         e.preventDefault();
@@ -119,17 +118,11 @@ function UserLayout(props) {
                         <Container>
 
                             <Navbar.Brand onClick={() => navigate('/')} style={{ fontSize: '24px', fontWeight: '700', color: '#1263CE', cursor: 'pointer' }}>
-                                D<span style={{ fontSize: '20px', fontWeight: '600' }}>esign </span>
-                                T<span style={{ fontSize: '20px', fontWeight: '600' }}>he </span>
-                                S<span style={{ fontSize: '20px', fontWeight: '600' }}>tyle</span>
+                                {/* <img src={process.env.PUBLIC_URL + '/img/logo1.png'} style={{ height: '28px' }}></img> */}
+                                {/* <img className="navbar-brand-logo" alt="logo" style={{ maxHeight:'28px' }}></img> */}
+                                <BrandLogo logo={logo} alt="logo" />
                             </Navbar.Brand>
                             <Form className="search-form d-flex flex-grow-1" onSubmit={handleSearch}>
-                                {/* <Form.Control
-                                    type="search"
-                                    placeholder="검색어를 입력하세요"
-                                    className="search-input me-2"
-                                    aria-label="Search"
-                                /> */}
                                 <Form.Control
                                     type="search"
                                     placeholder="검색어를 입력하세요"
@@ -216,10 +209,8 @@ function UserLayout(props) {
                             <Row className="w-100">
                                 <Col xs={8} md={8}>
                                     <Nav className="me-auto">
-                                        <Nav.Link onClick={() => { navigate('/itemlist') }}>여성</Nav.Link>
-                                        <Nav.Link onClick={() => { navigate('/itemlist') }}>남성</Nav.Link>
-                                        <Nav.Link onClick={() => { navigate('/itemlist') }}>키즈</Nav.Link>
-                                        <Nav.Link onClick={() => { navigate('/itemlist') }}>슈즈</Nav.Link>
+                                        <Nav.Link onClick={() => { navigate('/itemlist/male') }}>남성 의류</Nav.Link>
+                                        <Nav.Link onClick={() => { navigate('/itemlist/female') }}>여성 의류</Nav.Link>
                                     </Nav>
                                 </Col>
                                 <Col xs={4} md={4} className="d-flex justify-content-end">

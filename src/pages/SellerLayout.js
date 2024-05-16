@@ -68,32 +68,6 @@ function SellerLayout(props) {
     const toggleSidebar = () => setIsOpen(!isOpen);
     const [loading, setLoading] = useState(true);
 
-    // useEffect(() => {
-    //     const sellerIsLoggedIn = localStorage.getItem('sellerIsLoggedIn') === 'true';
-    //     const loginTime = parseInt(localStorage.getItem('sellerLoginTime'), 10);
-    //     const now = new Date().getTime();
-    //     const expirationTime = 60 * 60 * 1000; // 로그인 성공 후 1시간 지났으면 로그아웃
-    //     // const expirationTime = 5 * 1000; // 테스트용, 로그인 후 5초 후 재접속 시 로그아웃
-    //     const sellerData = JSON.parse(localStorage.getItem('sellerData'));
-        
-    //     if (sellerIsLoggedIn && (now - loginTime > expirationTime)) {
-    //         // 로그인 시간이 유효 기간을 초과했을 경우 로그아웃 처리
-    //         localStorage.removeItem('sellerIsLoggedIn');
-    //         localStorage.removeItem('sellerLoginTime');
-    //         localStorage.removeItem('sellerData');
-    //         dispatch(sellerLogout()); // Redux 상태 업데이트
-    //         alert('로그인 세션이 만료되었습니다. 다시 로그인 해주세요.');
-    //         navigate('/seller/login');
-    //         return;
-    //     }
-        
-    //     if (sellerIsLoggedIn && sellerData) {
-    //         dispatch(sellerLogin({ 'email_id': sellerData }));
-    //     }
-    //     setLoading(false);  // 로딩 상태 업데이트
-    // }, [dispatch]);
-    
-
     useEffect(() => {
         if(isLoggedIn) {
             navigate('/seller/statisticsanalysis');
@@ -149,11 +123,12 @@ function SellerLayout(props) {
                 <div className="content" style={{ flex: 1 }}>
 
                     <Navbar bg="light" data-bs-theme="light" style={{ marginLeft: '20px' }} >
-                        <Button style={{ background: '#003458' }} onClick={toggleSidebar}>☰</Button>
-                        <Navbar.Brand onClick={() => navigate('/seller')} style={{ fontSize: '24px', fontWeight: '700', color: '#1263CE', cursor: 'pointer', marginLeft: '10px' }}>
-                            D<span style={{ fontSize: '20px', fontWeight: '600' }}>esign </span>
+                        <Button style={{ background: '#343A40' }} onClick={toggleSidebar}>☰</Button>
+                        <Navbar.Brand onClick={() => navigate('/seller')} style={{ cursor: 'pointer', marginLeft: '10px' }}>
+                            {/* D<span style={{ fontSize: '20px', fontWeight: '600' }}>esign </span>
                             T<span style={{ fontSize: '20px', fontWeight: '600' }}>he </span>
-                            S<span style={{ fontSize: '20px', fontWeight: '700' }}>tyle 판매자 대시보드</span>
+                            S<span style={{ fontSize: '20px', fontWeight: '700' }}>tyle 판매자 대시보드</span> */}
+                            <img src={process.env.PUBLIC_URL + '/img/logo2.png'} style={{ height:'28px' }} alt="Logo"></img>
                         </Navbar.Brand>
                     </Navbar>
 
@@ -162,7 +137,7 @@ function SellerLayout(props) {
                         <Row>
                             <Col xs={isOpen ? 12 : 0} md={isOpen ? 2 : 0} className="sidebar">
                                 <div style={{ display: isOpen ? 'block' : 'none' }}>
-                                    <ul className="nav flex-column" style={{ backgroundColor: '#003458', minHeight: '100vh', ...sidebarStyle, padding: '1rem' }}>
+                                    <ul className="nav flex-column" style={{ backgroundColor: '#343A40', minHeight: '100vh', ...sidebarStyle, padding: '1rem' }}>
                                         <li className="nav-item">
                                             <StyledNavLink to="/seller/ordermanagement"><FaCartShopping /> 주문 관리</StyledNavLink>
                                         </li>

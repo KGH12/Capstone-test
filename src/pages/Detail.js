@@ -8,6 +8,7 @@ import { Container, Row, Col, Carousel, FloatingLabel, Form, Button, InputGroup 
 import { Dropdown } from 'react-bootstrap';
 import styled from 'styled-components';
 import { FaHeart } from 'react-icons/fa6';
+import Cookies from 'js-cookie';
 
 
 const StyledDropdownToggle = styled(Dropdown.Toggle)`
@@ -316,6 +317,21 @@ function Detail(props) {
     }, [isLoggedIn, userInfo]);
 
 
+    // 조회수 증가 API 호출
+    useEffect(() => {
+        const hasViewed = Cookies.get(`viewed-${clothesId}`);
+
+        if (!hasViewed) {
+            axios.put(`${process.env.REACT_APP_API_URL}/clothes/view/${clothesId}`)
+            .then(()=>{
+                console.log('조회수 증가');
+                Cookies.set(`viewed-${clothesId}`, 'true', { expires: 1 });
+            })
+            .catch((error)=>{
+                console.error('조회수 증가 요청 실패:', error);
+            })
+        }
+    }, [clothesId]);  // clothesId 또는 apiUrl 변경 시 다시 실행
 
     return (
         // <div className={"container start " + fade1}>
@@ -430,10 +446,10 @@ function Detail(props) {
                                     onClick={handleAddToCart}
                                     style={{
                                         width: '100%',
-                                        borderColor: '#007bff',  // Bootstrap의 기본 'primary' 색상
+                                        borderColor: '#000000',  // Bootstrap의 기본 'primary' 색상
                                         borderWidth: '1px',
                                         borderStyle: 'solid',
-                                        color: '#007bff',
+                                        color: '#000000',
                                         fontWeight: '700',
                                         height: '42px'
                                     }}
@@ -442,7 +458,7 @@ function Detail(props) {
                                 </Button>
                             </Col>
                             <Col md={6} xs={6}>
-                                <Button variant="primary" onClick={handleBuyNow} style={{ width: '100%', fontWeight: '700', height: '42px' }}>바로구매</Button>
+                                <Button variant="secondary" onClick={handleBuyNow} style={{ width: '100%', fontWeight: '700', height: '42px', backgroundColor: '#000000' }}>바로구매</Button>
                             </Col>
                         </Row>
                     </Col>
@@ -459,13 +475,13 @@ function Detail(props) {
                     <Col>
                         <Nav variant="tabs" defaultActiveKey="link0" className="mt-3">
                             <Nav.Item>
-                                <Nav.Link eventKey="link0" onClick={() => { setTab(0) }}>상품 정보</Nav.Link>
+                                <Nav.Link style={{color: '#000000'}} eventKey="link0" onClick={() => { setTab(0) }}>상품 정보</Nav.Link>
                             </Nav.Item>
                             <Nav.Item>
-                                <Nav.Link eventKey="link1" onClick={() => { setTab(1) }}>판매자 정보</Nav.Link>
+                                <Nav.Link style={{color: '#000000'}} eventKey="link1" onClick={() => { setTab(1) }}>판매자 정보</Nav.Link>
                             </Nav.Item>
                             <Nav.Item>
-                                <Nav.Link eventKey="link2" onClick={() => { setTab(2) }}>상품 리뷰</Nav.Link>
+                                <Nav.Link style={{color: '#000000'}} eventKey="link2" onClick={() => { setTab(2) }}>상품 리뷰</Nav.Link>
                             </Nav.Item>
                         </Nav>
                         <TabContent tab={tab} imgUrls={imgUrls} clothesId={clothesId} />
@@ -496,7 +512,7 @@ function TabContent({ tab, imgUrls, clothesId }) {
                 <Col md={{ offset: 2, span: 8 }} xs={12}>
                     <img key={index} src={img.imageUrl} alt={`Clothes Image ${index + 1}`}
                         style={{ width: '100%', marginBottom: '10px', display: 'block', marginLeft: 'auto', marginRight: 'auto' }}
-                    loading='lazy'/>
+                        loading='lazy' />
                 </Col>
             </Row >
 

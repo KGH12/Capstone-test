@@ -161,10 +161,14 @@ function App() {
               <Route path="location" element={<div> 위치정보 페이지입니다. </div>} />
             </Route>
 
-            <Route path="/itemlist" element={<ItemList />} />
-            <Route path="/itemlist/:category" element={<ItemList />} />
-            <Route path="/itemlist/:category/:major" element={<ItemList />} />
-            <Route path="/itemlist/:category/:major/:minor" element={<ItemList />} />
+            {/* <Route path="/itemlist/:category" element={<ItemList />} />
+            <Route path="/itemlist/:category/:majorcategoryId" element={<ItemList />} />
+            <Route path="/itemlist/:category/:subcategoryId" element={<ItemList />} /> */}
+            <Route path="/itemlist/:gender" element={<ItemList />}>
+              <Route path=":major" element={<ItemList />}>
+                <Route path=":minor" element={<ItemList />} />
+              </Route>
+            </Route>
 
             <Route path="/cart" element={<Cart />} />
             <Route path="/login" element={<Login />} />

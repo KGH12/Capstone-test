@@ -202,10 +202,10 @@ function SellerLogin(props) {
                                     onChange={handleCheckboxChange}
                                     label="아이디 저장" />
                             </Form.Group>
-                            <Button onClick={onClickConfirmButton} disabled={notAllow} variant="primary" className='login-Button'>
+                            <Button onClick={onClickConfirmButton} disabled={notAllow} variant="secondary" className='login-Button'>
                                 로그인
                             </Button>
-                            <Button onClick={() => { navigate('/seller/sellerjoin') }} variant="primary" className='join-Button' >
+                            <Button onClick={() => { navigate('/seller/sellerjoin') }} variant="secondary" className='join-Button' >
                                 회원가입
                             </Button>
                         </Form>

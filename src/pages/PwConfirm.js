@@ -74,10 +74,13 @@ function PwConfirm(props) {
                 </Col>
             </Row>
             <Row>
+                                <Col md={{ span: 8, offset: 1 }} xs={12}>
+
                 <div style={{ fontSize: '15px', fontWeight: '500', textAlign: 'left' }}>
-                    <div style={{ marginBottom: '10px' }}>
+                    <div style={{ marginBottom: '10px', textAlign:'center' }}>
+                        <strong>
                         회원님은 현재 {userInfo != null ? userInfo.email_id : ''}로 로그인하셨습니다.<br></br>
-                        개인정보보호를 위해 비밀번호를 입력해주세요.
+                        개인정보보호를 위해 비밀번호를 입력해주세요.</strong>
                     </div>
                     <Form>
                         <Form.Group className="mb-3 text-start" controlId="formBasicEmail">
@@ -86,13 +89,14 @@ function PwConfirm(props) {
                             />
                         </Form.Group>
 
-                        <Button onClick={onClickPwConfirm} variant="primary" className='login-Button'>
+                        <Button onClick={onClickPwConfirm} variant="secondary" className='login-Button'>
                             {/* type="submit"  */}
                             비밀번호 확인
                         </Button>
                     </Form>
 
                 </div>
+                </Col>
             </Row>
         </Container>
     )

@@ -127,7 +127,8 @@ function Checkout(props) {
                     axios.post(`${process.env.REACT_APP_API_URL}/receipt_detail`, {
                         receiptId: receiptId,
                         detailId: item.detailId,
-                        quantity: item.quantity
+                        quantity: item.quantity,
+                        status: 0
                     })
                         .then(response2 => {
                             console.log(`영수증 세부정보 생성 완료: ${response2.data.detailId}`);

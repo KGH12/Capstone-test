@@ -93,7 +93,7 @@ function OrderDeliveryStatus(props) {
                                     <td>{order.date}</td>
                                     <td>{statusLabels[order.status] || '상태 정보 없음'}</td>
                                     <td><Button
-                                        variant="outline-primary"
+                                        variant="outline-secondary"
                                         style={{ whiteSpace: 'nowrap' }}
                                         onClick={() => handleViewDetails(order.receiptId, order.date, order.status)}
                                     >

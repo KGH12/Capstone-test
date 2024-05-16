@@ -31,37 +31,32 @@ let RankingButton = styled.button`
 
 function Main(props) {
 
-    const [products, setProducts] = useState([]);
+    const [maleBestProducts, setMaleBestProducts] = useState([]);
+    const [femaleBestProducts, setFemaleBestProducts] = useState([]);
+    const [maleNewProducts, setMaleNewProducts] = useState([]);
+    const [femaleNewProducts, setFemaleNewProducts] = useState([]);
 
-    useEffect(() => {
-        fetchProducts()
-            .then(data => {
-                setProducts(data); // 상품 데이터를 상태에 저장
-            })
-            .catch(error => {
-                console.error("Failed to fetch products:", error);
-            });
-    }, []);
-
-    async function fetchProducts() {
-        // 서버의 상품 데이터 엔드포인트 URL. 실제 URL로 대체해야 합니다.
-        let url = `${process.env.REACT_APP_API_URL}/clothes`;
-
-        // category, major, minor 매개변수를 URL의 일부로 사용하여
-        // 필터링할 상품의 범위를 지정합니다.
-        // if (category) url += `/${category}`;
-        // if (major) url += `/${major}`;
-        // if (minor) url += `/${minor}`;
-        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ 백엔드 변경되면 주석 풀기.
+    // 상품 데이터를 가져오고 정렬하는 함수
+    const fetchAndSortProducts = async (gender, sortType) => {
         try {
-            const response = await axios.get(url);
-            return response.data; // 서버로부터 받은 데이터를 반환합니다.
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/clothes?gender=${gender}`);
+            const sortedResponse = await axios.put(`${process.env.REACT_APP_API_URL}/clothes/sort/${sortType}`, response.data);
+            return sortedResponse.data;
         } catch (error) {
-            console.error("There was a problem with the axios request:", error);
-            // throw error; // 에러를 다시 던져서 함수를 호출한 쪽에서 처리할 수 있도록 합니다.
+            console.error(`Failed to fetch or sort products: ${error}`);
+            // 여기에서 사용자에게 에러 상황을 알리는 UI 처리를 할 수 있습니다.
         }
     }
 
+    useEffect(() => {
+        const initProducts = async () => {
+            setMaleBestProducts(await fetchAndSortProducts(0, 1));
+            setFemaleBestProducts(await fetchAndSortProducts(1, 1));
+            setMaleNewProducts(await fetchAndSortProducts(0, 2));
+            setFemaleNewProducts(await fetchAndSortProducts(1, 2));
+        }
+        initProducts();
+    }, []);
 
 
     const [index, setIndex] = useState(0);
@@ -72,40 +67,32 @@ function Main(props) {
 
     let navigate = useNavigate();
 
-    let [btnCountNew, setBtnCountNew] = useState(0);
-    let [btnCountBest, setBtnCountBest] = useState(0);
-
     let [loading, setLoading] = useState(false);
 
 
-    let [bestRanking, setBestRanking] = useState(0); // 클릭한 인기 카테고리
-    let [newRanking, setNewRanking] = useState(0); // 클릭한 랭킹 카테고리
+    let [bestTap, setBestTap] = useState(0); // 클릭한 인기 카테고리
+    let [newTap, setNewTap] = useState(0); // 클릭한 랭킹 카테고리
 
     return (
         <div>
             {/* <div className="main-bg" style={{ backgroundImage: 'url(' + bg + ')', marginBottom: '20px' }}></div> */}
             <Carousel activeIndex={index} onSelect={handleSelect}>
                 <Carousel.Item interval={3000}>
-                    <ExampleCarouselImage text="First slide" productName='sneakers1' />
+                    <ExampleCarouselImage text="First slide" productName='main1' />
                     <Carousel.Caption>
-                        <h3>First slide label</h3>
-                        <p>Nulla vitae elit libero, a pharetra augue mollis interdum.</p>
+                        {/* <h3 style={{ fontSize:'32px', fontFamily:'Pretendard,sans-serif', fontWeight:'700'}}>페스티벌을 더욱 화려하게 즐기는 방법</h3> */}
                     </Carousel.Caption>
                 </Carousel.Item>
                 <Carousel.Item interval={3000}>
-                    <ExampleCarouselImage text="Second slide" productName='scarf1' />
+                    <ExampleCarouselImage text="Second slide" productName='main2' />
                     <Carousel.Caption>
-                        <h3>Second slide label</h3>
-                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                        {/* <h3 style={{ fontSize:'32px', fontFamily:'Pretendard,sans-serif', fontWeight:'700'}}>MD가 추천하는 주간 PICK!</h3> */}
                     </Carousel.Caption>
                 </Carousel.Item>
                 <Carousel.Item interval={3000}>
-                    <ExampleCarouselImage text="Third slide" productName='beachwear1' />
+                    <ExampleCarouselImage text="Third slide" productName='main3' />
                     <Carousel.Caption>
-                        <h3>Third slide label</h3>
-                        <p>
-                            Praesent commodo cursus magna, vel scelerisque nisl consectetur.
-                        </p>
+                        {/* <h3 style={{ fontSize:'32px', fontFamily:'Pretendard,sans-serif', fontWeight:'700'}}>FILA 인기 상품 할인중!</h3> */}
                     </Carousel.Caption>
                 </Carousel.Item>
             </Carousel>
@@ -115,58 +102,13 @@ function Main(props) {
 
             {/* 인기상품 */}
             <h1 style={{ fontSize: '30px', fontWeight: '700' }}>인기상품</h1>
-
             <br />
 
-            <RankingButton onClick={() => { setBestRanking(0) }} isActive={bestRanking === 0}>여성</RankingButton>
-            <RankingButton onClick={() => { setBestRanking(1) }} isActive={bestRanking === 1}>남성</RankingButton>
-            <RankingButton onClick={() => { setBestRanking(2) }} isActive={bestRanking === 2}>키즈</RankingButton>
-            <RankingButton onClick={() => { setBestRanking(3) }} isActive={bestRanking === 3}>슈즈</RankingButton>
+            <RankingButton onClick={() => { setBestTap(0) }} isActive={bestTap === 0}>남성 의류</RankingButton>
+            <RankingButton onClick={() => { setBestTap(1) }} isActive={bestTap === 1}>여성 의류</RankingButton>
             <br></br>
-            <RankingConTent ranking={bestRanking}></RankingConTent>
+            <RankingConTent products={(bestTap === 0 ? maleBestProducts : femaleBestProducts).slice(0, 12)} />
             <br></br>
-
-
-            <Container>
-                <Row>
-                    {
-                        products.map(function (a, i) {
-                            return (
-                                <CardItem products={a} key={a.clothesId} alt={a.name} navigate={navigate}></CardItem>
-                                // navigate 꼭 넘겨줘야함?
-                            )
-                        })
-                    }
-                </Row>
-            </Container>
-
-            {/* {(btnCountBest < 2)
-                ?
-                <div>
-                    {loading && <p>@@ 로딩중입니다 @@</p>}
-                    <button onClick={() => {
-                        setLoading(true);
-                        axios.get('https://codingapple1.github.io/shop/data' + (btnCountBest + 2) + '.json')
-                            .then((result) => {
-                                setLoading(false);
-                                let copy = [...shoes, ...result.data];
-                                dispatch(setShoes(copy));
-                                setBtnCountBest(btnCountBest + 1);
-                            })
-                            .catch(() => {
-                                setLoading(false);
-                                console.log('데이터 가져오기 실패')
-                            })
-                    }}>더보기</button>
-                </div>
-                : null
-            } */}
-
-
-
-
-
-
 
 
             {/* 여기부터 신상품 */}
@@ -179,71 +121,33 @@ function Main(props) {
 
 
 
-
-            <RankingButton onClick={() => { setNewRanking(0) }} isActive={newRanking === 0}>여성</RankingButton>
-            <RankingButton onClick={() => { setNewRanking(1) }} isActive={newRanking === 1}>남성</RankingButton>
-            <RankingButton onClick={() => { setNewRanking(2) }} isActive={newRanking === 2}>키즈</RankingButton>
-            <RankingButton onClick={() => { setNewRanking(3) }} isActive={newRanking === 3}>슈즈</RankingButton>
+            <RankingButton onClick={() => { setNewTap(0) }} isActive={newTap === 0}>남성 의류</RankingButton>
+            <RankingButton onClick={() => { setNewTap(1) }} isActive={newTap === 1}>여성 의류</RankingButton>
             <br></br>
-            <RankingConTent ranking={newRanking}></RankingConTent>
+            {/* <RankingConTent ranking={newTap}></RankingConTent> */}
+            <RankingConTent products={(newTap === 0 ? maleNewProducts : femaleNewProducts).slice(0, 12)} />
+
             <br></br>
 
-            {/* <Container>
-                <Row>
-                    {
-                        shoes.map(function (a, i) {
-                            return (
-                                <CardItem shoes={shoes[i]} index={i} key={i} navigate={navigate}></CardItem>
-                            )
-                        })
-                    }
-                </Row>
-            </Container> */}
-            <Container>
-                <Row>
-                    {
-                        products.map(function (a, i) {
-                            return (
-                                <CardItem products={a} key={a.clothesId} alt={a.name} navigate={navigate}></CardItem>
-                                // navigate 꼭 넘겨줘야함?
-                            )
-                        })
-                    }
-                </Row>
-            </Container>
-
-
-            {/* {(btnCountNew < 2)
-                ?
-                <div>
-                    {loading && <p>@@ 로딩중입니다 @@</p>}
-                    <button onClick={() => {
-                        setLoading(true);
-                        axios.get('https://codingapple1.github.io/shop/data' + (btnCountNew + 2) + '.json')
-                            .then((result) => {
-                                setLoading(false);
-                                let copy = [...shoes, ...result.data];
-                                dispatch(setShoes(copy));
-                                setBtnCountNew(btnCountNew + 1);
-                            })
-                            .catch(() => {
-                                setLoading(false);
-                                console.log('데이터 가져오기 실패')
-                            })
-                    }}>더보기</button>
-                </div>
-                : null
-            } */}
         </div>
     )
 }
 
-function RankingConTent(props) {
+function RankingConTent({ products }) {
+    let navigate = useNavigate();
     return (
-        <div>
-            {[<div>내용0</div>, <div>내용1</div>, <div>내용2</div>, <div>내용3</div>][props.ranking]}
-        </div>
-    )
+        <Container>
+            <Row>
+                {products && products.length > 0 ? (
+                    products.slice(0, 12).map((product, index) => (
+                        <CardItem products={product} key={product.clothesId} alt={product.name} navigate={navigate}></CardItem>
+                    ))
+                ) : (
+                    <p>No products available</p>
+                )}
+            </Row>
+        </Container>
+    );
 }
 
 export default Main;
