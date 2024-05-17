@@ -124,7 +124,7 @@ function SellerLayout(props) {
 
                     <Navbar bg="light" data-bs-theme="light" style={{ marginLeft: '20px' }} >
                         <Button style={{ background: '#343A40' }} onClick={toggleSidebar}>☰</Button>
-                        <Navbar.Brand onClick={() => navigate('/seller')} style={{ cursor: 'pointer', marginLeft: '10px' }}>
+                        <Navbar.Brand onClick={() => navigate('/seller/statisticsanalysis')} style={{ cursor: 'pointer', marginLeft: '10px' }}>
                             {/* D<span style={{ fontSize: '20px', fontWeight: '600' }}>esign </span>
                             T<span style={{ fontSize: '20px', fontWeight: '600' }}>he </span>
                             S<span style={{ fontSize: '20px', fontWeight: '700' }}>tyle 판매자 대시보드</span> */}

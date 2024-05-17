@@ -5,7 +5,7 @@ const ExampleCarouselImage = ({ text, productName }) => {
   let navigate = useNavigate();
   return (
     <div style={{ width: '100%', height: 'auto', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-      <img onClick={() => { navigate('/itemlist/male') }} src={process.env.PUBLIC_URL + '/img/' + productName + '.jpg'} alt={`캐러셀 슬라이드: ${text}`}
+      <img src={process.env.PUBLIC_URL + '/img/' + productName + '.jpg'} alt={`캐러셀 슬라이드: ${text}`}
         className="carousel-img"
       />
     </div>

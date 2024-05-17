@@ -87,15 +87,8 @@ function Detail(props) {
 
     let cartItems = useSelector((state) => state.cart.items);
 
-
-
     // fade 애니메이션
-    // let [fade1, setFade1] = useState('');
-
-    // 2초 이내 구매
-    // let [eventAlert, setEventAlert] = useState(true)
-
-
+    let [fade1, setFade1] = useState('');
 
     useEffect(() => {
         // 로그인 상태일 경우 좋아요 여부 불러오기
@@ -185,29 +178,6 @@ function Detail(props) {
     }, [clothesId])
 
 
-    // const handleAddToCart = () => {
-    //     if (!isLoggedIn) {
-    //         alert('로그인 후 이용해주세요.');
-    //         return;
-    //     }
-
-    //     if (!selectedDetail) {
-    //         alert('옵션을 선택해주세요.');
-    //         return;
-    //     }
-    //     const item = {
-    //         customerEmail: userInfo.email_id,
-    //         detailId: selectedDetail.detailId,
-    //         quantity
-    //     };
-
-    //     axios.post(`${process.env.REACT_APP_API_URL}/cart`, item)
-    //         .then(response => {
-    //             dispatch(addToCart(response.data));
-    //             alert('장바구니에 추가되었습니다.');
-    //         })
-    //         .catch(error => console.error("장바구니 담기 실패", error));
-    // };
     const handleAddToCart = () => {
         if (!isLoggedIn) {
             alert('로그인 후 이용해주세요.');
@@ -300,6 +270,13 @@ function Detail(props) {
     //     }
     // }, [])
 
+    useEffect(() => {
+        let t = setTimeout(() => { setFade1('end') }, 100)
+        return () => {
+            clearTimeout(t)
+            setFade1('')
+        }
+    }, [])
 
     // 로그인하지 않은 상태라면 로그인 페이지로 리디렉션
     useEffect(() => {
@@ -335,13 +312,11 @@ function Detail(props) {
 
     return (
         // <div className={"container start " + fade1}>
-        <div>
+        <div className={"container start " + fade1}>
             <br></br>
             <Container>
                 <Row>
                     <Col md={6} xs={12}>
-                        {/* <img src={imgUrls.length > 0 ? imgUrls[0].imageUrl : ''} width="100%" /> */}
-                        {/* 추후 캐러셀로 변경 예정 */}
                         <Carousel>
                             {
                                 imgUrls.map((img, index) => (
@@ -369,13 +344,8 @@ function Detail(props) {
                                 <FaHeart />
                                 <span>{likeCount > 999 ? '999+' : likeCount}</span>
                             </HeartButton>
-                            {/* <HeartButton onClick={toggleLike} isLiked={isLiked}>
-                                <FaHeart />
-                                <span>{likeCount > 999 ? '999+' : likeCount}</span>
-                            </HeartButton> */}
                         </div>
 
-                        {/* <p>{clothes.detail ? clothes.detail : '상세 정보 로딩 중...'}</p> */}
                         <p style={{ fontSize: '22px', fontWeight: '700' }}>{clothes.price ? `${clothes.price}원` : '가격 로딩 중...'}</p>
 
                         <Dropdown onSelect={(eventKey) => {
@@ -418,26 +388,6 @@ function Detail(props) {
                                     {clothes.price * quantity} 원
                                 </div>
                             </div>
-                            {/* <Col md={4} xs={4}>
-                                <InputGroup className="mb-3">
-                                    <Button variant="outline-secondary" onClick={() => setQuantity(Math.max(1, quantity - 1))}>-</Button>
-                                    <Form.Control
-                                        value={quantity}
-                                        onChange={e => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
-                                        type="text"
-                                        style={{ width: '15px' }}
-                                        onKeyPress={e => { // 숫자만 입력하도록 처리
-                                            if (!/[0-9]/.test(e.key)) {
-                                                e.preventDefault();
-                                            }
-                                        }}
-                                    />
-                                    <Button variant="outline-secondary" onClick={() => setQuantity(quantity + 1)}>+</Button>
-                                </InputGroup>
-                            </Col>
-                            <Col md={8} xs={8} style={{ fontSize: '22px', fontWeight: '700', textAlign: 'right' }}>
-                                {clothes.price * quantity} 원
-                            </Col> */}
                         </Row>
                         <Row>
                             <Col md={6} xs={6}>
@@ -464,13 +414,6 @@ function Detail(props) {
                     </Col>
                 </Row>
 
-                {/* <button onClick={() => {
-                    setLikeCount(999);
-                }}>SETLIKECOUNT 999</button>
-                <button onClick={() => {
-                    setLikeCount(1000);
-                }}>SETLIKECOUNT 1000</button> */}
-
                 <Row>
                     <Col>
                         <Nav variant="tabs" defaultActiveKey="link0" className="mt-3">
@@ -478,10 +421,7 @@ function Detail(props) {
                                 <Nav.Link style={{color: '#000000'}} eventKey="link0" onClick={() => { setTab(0) }}>상품 정보</Nav.Link>
                             </Nav.Item>
                             <Nav.Item>
-                                <Nav.Link style={{color: '#000000'}} eventKey="link1" onClick={() => { setTab(1) }}>판매자 정보</Nav.Link>
-                            </Nav.Item>
-                            <Nav.Item>
-                                <Nav.Link style={{color: '#000000'}} eventKey="link2" onClick={() => { setTab(2) }}>상품 리뷰</Nav.Link>
+                                <Nav.Link style={{color: '#000000'}} eventKey="link2" onClick={() => { setTab(1) }}>상품 리뷰</Nav.Link>
                             </Nav.Item>
                         </Nav>
                         <TabContent tab={tab} imgUrls={imgUrls} clothesId={clothesId} />
@@ -523,7 +463,6 @@ function TabContent({ tab, imgUrls, clothesId }) {
         <div className={"start " + fade2}>
             {[
                 <div>{renderImages()}</div>,
-                <div>내용1</div>,
                 <CommentsSection clothesId={clothesId} />
             ][tab]}
         </div>

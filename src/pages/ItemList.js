@@ -8,22 +8,6 @@ import CardItem from "./CardItem.js";
 import "firebase/firestore";
 import { useParams } from 'react-router-dom';
 
-
-// const categories = {
-//   male: [
-//     "아우터", "정장", "팬츠", "재킷/베스트", "셔츠", "니트", "티셔츠", "패션잡화", "언더웨어", "쥬얼리/시계"
-//   ],
-//   female: [
-//     "아우터", "재킷/베스트", "니트", "셔츠/블라우스", "티셔츠", "원피스", "팬츠", "스커트", "라운지/언더웨어", "비치웨어", "패션잡화", "쥬얼리/시계"
-//   ],
-//   shoes: [
-//     "슈즈"
-//   ],
-//   kids: [
-//     "키즈아우터", "키즈티셔츠", "키즈셔츠(남아)", "키즈셔츠/키즈블라우스(여아)", "키즈니트", "키즈팬츠"
-//   ]
-// };
-
 // Categories Data
 const categoriesData = {
   male: [
@@ -429,7 +413,7 @@ const categoriesDetailData = [
   },
   {
     "subCategoryId": 73,
-    "majorCategoryId": 22,
+    "subCategoryId": 22,
     "name": "구두"
   },
   {
@@ -464,16 +448,14 @@ function ItemList(props) {
   const [sortOrder, setSortOrder] = useState('인기상품순'); // 정렬 상태 초기화
   const navigate = useNavigate();
 
-  // useEffect(() => {
-  // // gender 값이 'male' 또는 'female'이 아니면 메인 페이지로 리디렉션
-  // if (gender !== 'male' && gender !== 'female') {
-  //   navigate('/');
-  // } else {
-  //   fetchProducts(gender, major, minor); // fetchProducts 함수 호출
-  // }  }, [gender, major, minor]); // 카테고리 또는 major/minor가 변경될 때마다 호출
-
   useEffect(() => {
     const validateCategory = async () => {
+      if (!categoriesData[gender]) {
+        console.error("Invalid gender specified.");
+        navigate('/'); // 유효하지 않은 gender 값에 대해 메인 페이지로 리디렉션
+        return;
+      }
+
       if (major && !categoriesData[gender].some(cat => cat.id === parseInt(major))) {
         console.error("Invalid major category ID");
         navigate('/'); // 유효하지 않은 major 카테고리 ID에 대해 메인 페이지로 리디렉션
@@ -516,10 +498,6 @@ function ItemList(props) {
   
 
   const categoryLinks = generateCategoryLinks();
-  // const categoryLinks = categoriesData[gender]?.map(subcat => (
-  //   <Nav.Link key={subcat.id} onClick={() => navigate(`/itemlist/${gender}/${subcat.id}`)}>{subcat.name}</Nav.Link>
-  // ));
-
   async function fetchProducts(gender, major, minor) {
     setLoading(true); // 데이터 로딩 시작
     setError(null); // 오류 초기화
@@ -543,20 +521,11 @@ function ItemList(props) {
 
     url += `?${params.toString()}`;
 
-    // try {
-    //   const response = await axios.get(url);
-    //   setProducts(response.data);
-    // } catch (error) {
-    //   setError(error);
-    // } finally {
-    //   setLoading(false); // 데이터 로딩 완료
-    // }
-
     axios.get(url)
       .then((response1) => {
         axios.put(`${process.env.REACT_APP_API_URL}/clothes/sort/1`, response1.data)
           .then((response2) => {
-            setProducts(response2.data);
+            setProducts(response2.data || []); // response2.data가 null일 경우 빈 배열로 설정
             setLoading(false); // 데이터 로딩 완료
           })
           .catch((error) => {
@@ -572,7 +541,6 @@ function ItemList(props) {
       })
 
   }
-
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
@@ -603,7 +571,7 @@ function ItemList(props) {
       // 서버에 PUT 요청을 보내 데이터 정렬 요청
       const response = await axios.put(`${process.env.REACT_APP_API_URL}/clothes/sort/${sortKey}`, products);
       console.log("정렬 상품:", response.data);
-      setProducts(response.data);
+      setProducts(response.data || []); // response.data가 null일 경우 빈 배열로 설정
       setSortOrder(sortText);
     } catch (error) {
       console.error('상품 정렬 실패:', error);
@@ -622,7 +590,7 @@ function ItemList(props) {
               <>
                 <span>&gt;</span>
                 <Link to={`/itemlist/${gender}`} style={{ color: !major ? 'black' : 'gray', textDecoration: 'none', margin: '0 5px' }}>
-                  {gender == 'male' ? '남성 의류' : '여성 의류'}
+                  {gender === 'male' ? '남성 의류' : '여성 의류'}
                 </Link>
               </>
             )}
@@ -651,8 +619,6 @@ function ItemList(props) {
           <Col xs={6} md={6}>
             <div style={{ textAlign: 'left', fontSize: '40px', fontWeight: '700', margin: '20px 0 10px 0' }}>{displayCategoryName()}</div>
           </Col>
-
-
         </Row>
         <Row>
           <Col>
@@ -664,7 +630,7 @@ function ItemList(props) {
           <Col>
             <Navbar style={{ background: '#ffffff' }} data-bs-theme="light">
               <Container>
-                <Nav className="me-auto">
+                <Nav className="me-auto" style={{ flexWrap: 'wrap' }}>
                   {categoryLinks}
                 </Nav>
               </Container>
@@ -673,9 +639,6 @@ function ItemList(props) {
         </Row>
 
       </Container>
-
-
-
 
       <Container>
 
@@ -700,12 +663,10 @@ function ItemList(props) {
         </Row>
       </Container>
 
-
-
       <Container>
         <Row>
           {
-            products.map(function (a, i) {
+            (Array.isArray(products) ? products : []).map(function (a, i) {
               return (
                 <CardItem products={a} key={a.clothesId} alt={a.name} navigate={navigate}></CardItem>
               )
@@ -713,12 +674,8 @@ function ItemList(props) {
           }
         </Row>
       </Container>
-
-
-
     </div>
   )
 }
-
 
 export default ItemList;

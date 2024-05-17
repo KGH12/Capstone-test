@@ -169,10 +169,10 @@ function StatisticsAnalysis() {
         <Container className="mt-5">
             <Row>
                 <Col className="text-center mb-4">
-                    <h1>통계 분석</h1>
+                    <h1 style={{ fontSize: '30px', fontWeight: '700' }}>통계 분석</h1>
                 </Col>
             </Row>
-            <Row>
+            <Row className="select-container">
                 <Col xs={12} md={6}>
                     <select className="form-control" value={selectedProduct} onChange={e => setSelectedProduct(e.target.value)}>
                         {products.map(product => (

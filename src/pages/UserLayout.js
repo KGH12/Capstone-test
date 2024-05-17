@@ -238,7 +238,25 @@ function UserLayout(props) {
 
 
                     <Outlet></Outlet>
-
+      {/* <div className="col-md-3 recent-items">
+        <h5>최근 본 상품</h5>
+        {recentItemId && recentItemId.length > 0 ? (
+          <div>
+            {recentItemId.map(function (a, i) {
+              return (
+                <div key={i}>
+                  <img src={process.env.PUBLIC_URL + '/img/shoes' + (recentItemId[i] + 1) + '.jpg'} alt={`Shoe ${recentItemId[i] + 1}`} style={{ width: '100%', cursor: 'pointer' }}
+                    onClick={() => {
+                      navigate(`/detail/${recentItemId[i]}`)
+                    }} />
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <p>최근 본 상품이 없습니다.</p>
+        )}
+      </div> */}
                 </div>
                 <Navbar bg="light" data-bs-theme="light" style={{ width: '100%' }}>
                     <Container>

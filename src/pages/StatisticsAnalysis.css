@@ -1,4 +1,4 @@
-/* src/pages/StatisticsAnalysis.css */
+src/pages/StatisticsAnalysis.css
 .mt-5 {
     margin-top: 3rem;
 }
@@ -20,4 +20,10 @@
     border: 1px solid #ced4da;
     border-radius: 0.25rem;
     transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.select-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
 }

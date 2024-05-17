@@ -43,15 +43,16 @@ function Main(props) {
         } catch (error) {
             console.error(`Failed to fetch or sort products: ${error}`);
             // 여기에서 사용자에게 에러 상황을 알리는 UI 처리를 할 수 있습니다.
+            return [];
         }
     }
 
     useEffect(() => {
         const initProducts = async () => {
-            setMaleBestProducts(await fetchAndSortProducts(0, 1));
-            setFemaleBestProducts(await fetchAndSortProducts(1, 1));
-            setMaleNewProducts(await fetchAndSortProducts(0, 2));
-            setFemaleNewProducts(await fetchAndSortProducts(1, 2));
+            setMaleBestProducts(await fetchAndSortProducts(0, 1) || []);
+            setFemaleBestProducts(await fetchAndSortProducts(1, 1) || []);
+            setMaleNewProducts(await fetchAndSortProducts(0, 2) || []);
+            setFemaleNewProducts(await fetchAndSortProducts(1, 2) || []);
         }
         initProducts();
     }, []);
@@ -133,11 +134,12 @@ function Main(props) {
 
 function RankingConTent({ products }) {
     let navigate = useNavigate();
+    const safeProducts = products || [];
     return (
         <Container>
             <Row>
-                {products && products.length > 0 ? (
-                    products.slice(0, 12).map((product, index) => (
+                {safeProducts.length > 0 ? (
+                    safeProducts.slice(0, 12).map((product, index) => (
                         <CardItem products={product} key={product.clothesId} alt={product.name} navigate={navigate}></CardItem>
                     ))
                 ) : (

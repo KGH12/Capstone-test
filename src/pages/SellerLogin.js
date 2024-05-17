@@ -184,6 +184,7 @@ function SellerLogin(props) {
                                 <Form.Label className='login-InputTitle'>비밀번호</Form.Label>
                                 <div className='login-InputWrap'>
                                     <Form.Control
+                                        style={{ fontFamily: 'serif' }}
                                         id="password-input"
                                         value={pw}
                                         onChange={handlePw}

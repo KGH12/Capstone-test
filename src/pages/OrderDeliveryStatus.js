@@ -20,25 +20,12 @@ function OrderDeliveryStatus(props) {
         5: "반품 완료"
     };
 
-    // useEffect(() => {
-    //     if (!isLoggedIn || !userInfo) {
-    //         return; // 로그인 상태나 userInfo가 유효하지 않은 경우 early return을 사용
-    //     }
-    //     if (!isLoggedIn) {
-    //         alert('로그인 후 이용해주세요.');
-    //         navigate('/login');
-    //     }
-    // }, [isLoggedIn, userInfo, navigate]);
-
     useEffect(() => {
         if (!isLoading && !isLoggedIn) {
             alert('로그인 후 이용해주세요.');
             navigate('/login');
         }
     }, [isLoggedIn, isLoading, navigate]);
-
-
-
 
     useEffect(() => {
         const fetchOrders = async () => {
@@ -57,14 +44,12 @@ function OrderDeliveryStatus(props) {
         }
     }, [userInfo]);
 
-
     const handleViewDetails = (receiptId, date, status) => {
-        // navigate(`orderdetails/${receiptId}`, {
-        //     state: { date: date, status: status } // 여기에 필요한 정보를 넣어서 전달합니다.
-        // });
         navigate(`orderdetails/${receiptId}`);
     };
 
+    if (isLoading) return <div>Loading...</div>; // 로딩 중 표시
+    if (!isLoggedIn) return null; // 비로그인 상태에서는 아무것도 표시하지 않음
 
     return (
         <div>
@@ -86,7 +71,7 @@ function OrderDeliveryStatus(props) {
                             </tr>
                         </thead>
                         <tbody>
-                            {orders.map((order, index) => (
+                            {(orders || []).map((order, index) => (
                                 <tr key={index}>
                                     <td>{index + 1}</td>
                                     <td>{order.receiptId}</td>
