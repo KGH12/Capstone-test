@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import "firebase/firestore";
 import { storage } from "../firebaseConfig.js";
-import { ref, uploadBytes, getDownloadURL, uploadString } from "firebase/storage";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { getStorage, deleteObject } from "firebase/storage";
 
 

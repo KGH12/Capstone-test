@@ -2,7 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { logout, pwConfirm } from "../store/userSlice";
+import { pwConfirm } from "../store/userSlice";
 import { Container, Row, Col, Form, Button } from 'react-bootstrap';
 
 

@@ -2,7 +2,6 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { Form, Button, Row, Col, Container } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import { debounce } from 'lodash';
 import DaumPostcode from 'react-daum-postcode';
 import Modal from 'react-bootstrap/Modal';
 

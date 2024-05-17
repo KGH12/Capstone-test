@@ -4,7 +4,7 @@ import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { NavLink as ReactRouterNavLink } from 'react-router-dom';
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { sellerLogin, sellerLogout } from "../store/sellerSlice";
+import { sellerLogout } from "../store/sellerSlice";
 import { FaShirt, FaCartShopping, FaChartPie, FaList, FaCircleUser } from "react-icons/fa6";
 
 

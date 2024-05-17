@@ -1,20 +1,10 @@
-import { lazy, Suspense, useEffect, useState } from "react";
-import { Button, Navbar, Container, Nav, Row, Col, Form, FormControl } from 'react-bootstrap';
+import { lazy, Suspense, useEffect } from "react";
 import './App.css';
-import { Routes, Route, useNavigate, Outlet, Link } from 'react-router-dom';
-import axios from 'axios'
-import { useQuery } from "react-query";
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import ProductRegistration from "./pages/ProductRegistration.js";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
-import { useDispatch, useSelector } from "react-redux";
-import { login, logout, setUserLoading, setUserLoginState } from "./store/userSlice.js";
-import Badge from 'react-bootstrap/Badge';
-import { FaShoppingCart } from 'react-icons/fa';
-import { BsCart2 } from "react-icons/bs";
-import { FaUser } from "react-icons/fa";
+import { useDispatch } from "react-redux";
+import { login, logout, setUserLoading } from "./store/userSlice.js";
 import SellerLogin from "./pages/SellerLogin.js";
-import Dashboard from "./pages/Dashboard.js";
 import SellerLayout from "./pages/SellerLayout.js";
 import UserLayout from "./pages/UserLayout.js";
 import ProductList from "./pages/ProductList.js";

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import CardItem from './CardItem'; 
-import { Col, Container, Dropdown, Pagination, Row } from 'react-bootstrap';
+import { Col, Container, Dropdown, Row } from 'react-bootstrap';
 
 const SearchResults = () => {
 

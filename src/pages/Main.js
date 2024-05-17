@@ -1,12 +1,10 @@
 import Carousel from 'react-bootstrap/Carousel';
 import ExampleCarouselImage from './ExampleCarouseImage';
 import CardItem from './CardItem';
-import { Container, Row, Col } from 'react-bootstrap';
+import { Container, Row } from 'react-bootstrap';
 import './../App.css';
-import { useDispatch, useSelector } from 'react-redux';
-import Nav from 'react-bootstrap/Nav';
 import styled from 'styled-components'
-import { lazy, Suspense, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 
 import { useNavigate } from 'react-router-dom';

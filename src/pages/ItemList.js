@@ -1,15 +1,11 @@
-import { lazy, Suspense, useEffect, useState } from "react";
-import { Button, Navbar, Container, Nav, Row, Col, Card, ButtonGroup, ButtonToolbar, Dropdown, Image, Pagination } from 'react-bootstrap';
+import { useEffect, useState } from "react";
+import { Navbar, Container, Nav, Row, Col, Dropdown } from 'react-bootstrap';
 import './../App.css';
-import { Routes, Route, useNavigate, Outlet } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios'
-import { useQuery } from "react-query";
 import { Link } from 'react-router-dom';
-import Breadcrumb from 'react-bootstrap/Breadcrumb';
 import CardItem from "./CardItem.js";
 import "firebase/firestore";
-import { storage } from "../firebaseConfig.js";
 import { useParams } from 'react-router-dom';
 
 

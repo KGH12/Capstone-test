@@ -1,10 +1,9 @@
-import { Button, Navbar, Container, Nav, Row, Col, Form, FormControl } from 'react-bootstrap';
+import { Button, Navbar, Container, Nav, Row, Col, Form } from 'react-bootstrap';
 import '../App.css';
-import { Routes, Route, useNavigate, Outlet, Link } from 'react-router-dom';
+import { useNavigate, Outlet } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
-import { login, logout, setUserLoading } from "../store/userSlice.js";
-import Badge from 'react-bootstrap/Badge';
+import { logout } from "../store/userSlice.js";
 import { FaShoppingCart } from 'react-icons/fa';
 import { FaUser } from "react-icons/fa";
 import { useEffect, useState } from 'react';
