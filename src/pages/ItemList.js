@@ -448,7 +448,18 @@ function ItemList(props) {
   const [sortOrder, setSortOrder] = useState('인기상품순'); // 정렬 상태 초기화
   const navigate = useNavigate();
 
-  useEffect(() => {
+    // fade 애니메이션
+    let [fade1, setFade1] = useState('');
+
+    useEffect(() => {
+      let t = setTimeout(() => { setFade1('end') }, 500)
+      return () => {
+          clearTimeout(t)
+          setFade1('')
+      }
+  }, [gender, major, minor])
+
+    useEffect(() => {
     const validateCategory = async () => {
       if (!categoriesData[gender]) {
         console.error("Invalid gender specified.");
@@ -579,7 +590,7 @@ function ItemList(props) {
   };
 
   return (
-    <div>
+    <div className={"start " + fade1}>
       <Container>
         <Row className="justify-content-start" style={{ fontSize: '12px', color: 'gray', margin: '10px 15px' }}>
           <Col xs={12} md={12} className="text-nowrap" style={{ textAlign: 'left' }}>

@@ -80,8 +80,6 @@ function Login(props) {
             localStorage.setItem('userEmail', email);
             localStorage.setItem('rememberMe', 'true');
           } else {
-            // localStorage.removeItem('userEmail');
-            // localStorage.removeItem('rememberMe');
             localStorage.setItem('userEmail', '');
             localStorage.setItem('rememberMe', 'false');
           }

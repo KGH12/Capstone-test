@@ -95,32 +95,6 @@ function SellerJoin(props) {
     handleNumericInput(e, setPhone3);
   }
 
-
-  // let handlePhone1Change = (e) => {
-  //   if (e.target.value.length <= 3) {
-  //     setPhone1(e.target.value);
-  //   }
-  //   if (e.target.value.length === 3) {
-  //     document.getElementById('phone2').focus();
-  //   }
-  // }
-
-  // let handlePhone2Change = (e) => {
-  //   if (e.target.value.length <= 4) {
-  //     setPhone2(e.target.value);
-  //   }
-  //   if (e.target.value.length === 4) {
-  //     document.getElementById('phone3').focus();
-  //   }
-  // }
-
-  // let handlePhone3Change = (e) => {
-  //   if (e.target.value.length <= 4) {
-  //     setPhone3(e.target.value);
-  //   }
-  // }
-
-
   let handleEmail = (e) => {
     setEmail(e.target.value);
     let regex =
@@ -173,39 +147,6 @@ function SellerJoin(props) {
       setPwConfirmValid(false);
     }
   }, [pw, pwConfirm])
-
-
-  // 판매자 이메일 중복검사 X
-  // // 중복 검사를 수행하는 함수
-  // let checkEmailDuplication = async () => {
-  //   if (email.trim() === '') {
-  //     setEmailDupCheck(null);
-  //     return;
-  //   }
-
-  //   try {
-  //     axios.get(`${process.env.REACT_APP_API_URL}/sellers/email/${email}`)
-  //       .then((result) => {
-  //         setEmailDupCheck(result.data);
-  //       })
-  //       .catch(() => {
-  //         console.log("사용중인 이메일");
-  //       })
-  //   } catch { }
-  // };
-
-  // // debounce를 사용하여 입력이 멈춘 후 검사 수행
-  // let debouncedCheckEmailDuplication = debounce(checkEmailDuplication, 500);
-
-  // useEffect(() => {
-  //   debouncedCheckEmailDuplication();
-
-  //   // 컴포넌트가 언마운트될 때 debounce 취소
-  //   return () => {
-  //     debouncedCheckEmailDuplication.cancel();
-  //   };
-  // }, [email]); // email 상태가 변경될 때마다 실행
-
 
   return (
     <div>

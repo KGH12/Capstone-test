@@ -34,6 +34,17 @@ function Main(props) {
     const [maleNewProducts, setMaleNewProducts] = useState([]);
     const [femaleNewProducts, setFemaleNewProducts] = useState([]);
 
+    // fade 애니메이션
+    let [fade1, setFade1] = useState('');
+
+    useEffect(() => {
+        let t = setTimeout(() => { setFade1('end') }, 300)
+        return () => {
+            clearTimeout(t)
+            setFade1('')
+        }
+    }, [])
+
     // 상품 데이터를 가져오고 정렬하는 함수
     const fetchAndSortProducts = async (gender, sortType) => {
         try {
@@ -69,29 +80,25 @@ function Main(props) {
     let [loading, setLoading] = useState(false);
 
 
-    let [bestTap, setBestTap] = useState(0); // 클릭한 인기 카테고리
-    let [newTap, setNewTap] = useState(0); // 클릭한 랭킹 카테고리
+    let [bestTab, setBestTab] = useState(0); // 클릭한 인기 카테고리
+    let [newTab, setNewTab] = useState(0); // 클릭한 랭킹 카테고리
 
     return (
-        <div>
-            {/* <div className="main-bg" style={{ backgroundImage: 'url(' + bg + ')', marginBottom: '20px' }}></div> */}
+        <div className={"start " + fade1}>
             <Carousel activeIndex={index} onSelect={handleSelect}>
                 <Carousel.Item interval={3000}>
                     <ExampleCarouselImage text="First slide" productName='main1' />
                     <Carousel.Caption>
-                        {/* <h3 style={{ fontSize:'32px', fontFamily:'Pretendard,sans-serif', fontWeight:'700'}}>페스티벌을 더욱 화려하게 즐기는 방법</h3> */}
                     </Carousel.Caption>
                 </Carousel.Item>
                 <Carousel.Item interval={3000}>
                     <ExampleCarouselImage text="Second slide" productName='main2' />
                     <Carousel.Caption>
-                        {/* <h3 style={{ fontSize:'32px', fontFamily:'Pretendard,sans-serif', fontWeight:'700'}}>MD가 추천하는 주간 PICK!</h3> */}
                     </Carousel.Caption>
                 </Carousel.Item>
                 <Carousel.Item interval={3000}>
                     <ExampleCarouselImage text="Third slide" productName='main3' />
                     <Carousel.Caption>
-                        {/* <h3 style={{ fontSize:'32px', fontFamily:'Pretendard,sans-serif', fontWeight:'700'}}>FILA 인기 상품 할인중!</h3> */}
                     </Carousel.Caption>
                 </Carousel.Item>
             </Carousel>
@@ -103,10 +110,10 @@ function Main(props) {
             <h1 style={{ fontSize: '30px', fontWeight: '700' }}>인기상품</h1>
             <br />
 
-            <RankingButton onClick={() => { setBestTap(0) }} isActive={bestTap === 0}>남성 의류</RankingButton>
-            <RankingButton onClick={() => { setBestTap(1) }} isActive={bestTap === 1}>여성 의류</RankingButton>
+            <RankingButton onClick={() => { setBestTab(0) }} isActive={bestTab === 0}>남성 의류</RankingButton>
+            <RankingButton onClick={() => { setBestTab(1) }} isActive={bestTab === 1}>여성 의류</RankingButton>
             <br></br>
-            <RankingConTent products={(bestTap === 0 ? maleBestProducts : femaleBestProducts).slice(0, 12)} />
+            <RankingConTent tab={bestTab} products={(bestTab === 0 ? maleBestProducts : femaleBestProducts).slice(0, 12)} />
             <br></br>
 
 
@@ -120,11 +127,10 @@ function Main(props) {
 
 
 
-            <RankingButton onClick={() => { setNewTap(0) }} isActive={newTap === 0}>남성 의류</RankingButton>
-            <RankingButton onClick={() => { setNewTap(1) }} isActive={newTap === 1}>여성 의류</RankingButton>
+            <RankingButton onClick={() => { setNewTab(0) }} isActive={newTab === 0}>남성 의류</RankingButton>
+            <RankingButton onClick={() => { setNewTab(1) }} isActive={newTab === 1}>여성 의류</RankingButton>
             <br></br>
-            {/* <RankingConTent ranking={newTap}></RankingConTent> */}
-            <RankingConTent products={(newTap === 0 ? maleNewProducts : femaleNewProducts).slice(0, 12)} />
+            <RankingConTent tab={newTab} products={(newTab === 0 ? maleNewProducts : femaleNewProducts).slice(0, 12)} />
 
             <br></br>
 
@@ -132,11 +138,22 @@ function Main(props) {
     )
 }
 
-function RankingConTent({ products }) {
+function RankingConTent({ tab, products }) {
     let navigate = useNavigate();
+    let [fade2, setFade2] = useState('')
     const safeProducts = products || [];
+    
+    useEffect(() => {
+        let a = setTimeout(() => { setFade2('end') }, 200)
+
+        return () => {
+            clearTimeout(a)
+            setFade2('')
+        }
+    }, [tab])
+
     return (
-        <Container>
+        <Container className={"start " + fade2}>
             <Row>
                 {safeProducts.length > 0 ? (
                     safeProducts.slice(0, 12).map((product, index) => (

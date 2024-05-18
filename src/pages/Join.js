@@ -94,32 +94,6 @@ function Join(props) {
     handleNumericInput(e, setPhone3);
   }
 
-
-  // let handlePhone1Change = (e) => {
-  //   if (e.target.value.length <= 3) {
-  //     setPhone1(e.target.value);
-  //   }
-  //   if (e.target.value.length === 3) {
-  //     document.getElementById('phone2').focus();
-  //   }
-  // }
-
-  // let handlePhone2Change = (e) => {
-  //   if (e.target.value.length <= 4) {
-  //     setPhone2(e.target.value);
-  //   }
-  //   if (e.target.value.length === 4) {
-  //     document.getElementById('phone3').focus();
-  //   }
-  // }
-
-  // let handlePhone3Change = (e) => {
-  //   if (e.target.value.length <= 4) {
-  //     setPhone3(e.target.value);
-  //   }
-  // }
-
-
   let handleEmail = (e) => {
     setEmail(e.target.value);
     let regex =

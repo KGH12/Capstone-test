@@ -29,9 +29,6 @@ function OrderDetails() {
     const navigate = useNavigate();
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
-    // const [status, setStatus] = useState('');
-    // const [data, setDate] = useState('');
-    // const { date, status } = location.state; // 넘어온 데이터 사용
     const { receiptId } = useParams();
     const [orderDetails, setOrderDetails] = useState([]);
     const [loading, setLoading] = useState(true);

@@ -150,32 +150,38 @@ function Detail(props) {
 
     };
 
-
     useEffect(() => {
-        axios.get(`${process.env.REACT_APP_API_URL}/clothes/${clothesId}`)
-            .then(result => {
-                setClothes(result.data);
-            })
-            .catch(error => {
-                console.log('상품 데이터 로딩 에러', error);
-            })
-
-        axios.get(`${process.env.REACT_APP_API_URL}/detail/clothes/${clothesId}`)
-            .then(result => {
-                setDetails(result.data);
-            })
-            .catch(error => {
-                console.log('상품 상세 정보 로딩 에러', error);
-            })
-
-        axios.get(`${process.env.REACT_APP_API_URL}/clothes_images/${clothesId}`)
-            .then(result => {
-                setImgUrls(result.data);
-            })
-            .catch(error => {
-                console.log('이미지 로딩 에러', error);
-            })
-    }, [clothesId])
+        const fetchData = async () => {
+            try {
+                // 동시에 세 가지 정보를 요청
+                const clothesResponse = await axios.get(`${process.env.REACT_APP_API_URL}/clothes/${clothesId}`);
+                const detailsResponse = await axios.get(`${process.env.REACT_APP_API_URL}/detail/clothes/${clothesId}`);
+                const imagesResponse = await axios.get(`${process.env.REACT_APP_API_URL}/clothes_images/${clothesId}`);
+    
+                // 응답 데이터 설정
+                setClothes(clothesResponse.data);
+                setDetails(detailsResponse.data);
+                setImgUrls(imagesResponse.data);
+    
+                // 최근 본 상품 정보 업데이트
+                const imgUrl = imagesResponse.data.length > 0 ? imagesResponse.data[0].imageUrl : ''; // 첫 번째 이미지 URL
+                const newItem = { id: clothesId, imageUrl: imgUrl };
+                let items = JSON.parse(sessionStorage.getItem('watched') || '[]');
+                if (!items.some(item => item.id === newItem.id)) {
+                    items = [...items, newItem];
+                    sessionStorage.setItem('watched', JSON.stringify(items));
+                    // 커스텀 이벤트 발생
+                    window.dispatchEvent(new CustomEvent('recent-items-updated'));
+                }
+    
+            } catch (error) {
+                console.log('데이터 로딩 에러:', error);
+            }
+        };
+    
+        fetchData();
+    }, [clothesId]);
+    
 
 
     const handleAddToCart = () => {
@@ -253,25 +259,28 @@ function Detail(props) {
         });
     };
 
-    // 최근 본 상품 추가
-    // useEffect(() => {
-    //     let a = JSON.parse(localStorage.getItem('watched'))
-    //     a.push(selectedShoes.id)
-    //     a = new Set(a)
-    //     a = Array.from(a)
-    //     localStorage.setItem('watched', JSON.stringify(a))
-
-    //     setTimeout(() => { setEventAlert(false) }, 2000)
-
-    //     let t = setTimeout(() => { setFade1('end') }, 100)
-    //     return () => {
-    //         clearTimeout(t)
-    //         setFade1('')
-    //     }
-    // }, [])
-
+    // 최근 본 상품 기능
+    // useEffect에서 로컬 스토리지를 업데이트하는 로직 추가
     useEffect(() => {
-        let t = setTimeout(() => { setFade1('end') }, 100)
+        let watchedItems = JSON.parse(sessionStorage.getItem('watched') || '[]');  // 'const'를 'let'으로 변경
+        if (imgUrls.length > 0) {
+            const imgUrl = imgUrls.find(item => item.order === 1)?.imageUrl;
+            if (imgUrl) {  // imgUrl이 존재하는지 확인
+                const newItem = { id: clothesId, imageUrl: imgUrl };
+    
+                // watchedItems 중에 newItem과 동일한 id를 가진 항목이 없을 경우 추가
+                if (!watchedItems.some(item => item.id === newItem.id)) {
+                    watchedItems.push(newItem);
+
+                    // sessionStorage 업데이트
+                    sessionStorage.setItem('watched', JSON.stringify(watchedItems));
+                }
+            }
+        }
+    }, [clothesId, imgUrls]);  // clothesId, imgUrls가 변경될 때마다 이 useEffect 실행
+    
+    useEffect(() => {
+        let t = setTimeout(() => { setFade1('end') }, 300)
         return () => {
             clearTimeout(t)
             setFade1('')
@@ -300,18 +309,18 @@ function Detail(props) {
 
         if (!hasViewed) {
             axios.put(`${process.env.REACT_APP_API_URL}/clothes/view/${clothesId}`)
-            .then(()=>{
-                console.log('조회수 증가');
-                Cookies.set(`viewed-${clothesId}`, 'true', { expires: 1 });
-            })
-            .catch((error)=>{
-                console.error('조회수 증가 요청 실패:', error);
-            })
+                .then(() => {
+                    console.log('조회수 증가');
+                    Cookies.set(`viewed-${clothesId}`, 'true', { expires: 1 });
+                })
+                .catch((error) => {
+                    console.error('조회수 증가 요청 실패:', error);
+                })
         }
     }, [clothesId]);  // clothesId 또는 apiUrl 변경 시 다시 실행
 
+
     return (
-        // <div className={"container start " + fade1}>
         <div className={"container start " + fade1}>
             <br></br>
             <Container>
@@ -332,10 +341,14 @@ function Detail(props) {
                         </Carousel>
                     </Col>
                     <Col md={6} xs={12} style={{ textAlign: 'left' }}>
-                        {/* <div className="pt-5" style={{ fontSize: '25px', fontWeight: '700', marginBottom: '15px' }}>{clothes.name ? clothes.name : '로딩 중...'}</div> */}
                         <div className="pt-5" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <div style={{ fontSize: '25px', fontWeight: '700', marginBottom: '15px' }}>
-                                {clothes.name ? clothes.name : '로딩 중...'}
+                            <div>
+                                <div style={{ fontSize: '20px', fontWeight: '500', marginBottom: '10px', color: '#555' }}>
+                                    {clothes.brandName ? clothes.brandName : '브랜드 로딩 중...'}
+                                </div>
+                                <div style={{ fontSize: '25px', fontWeight: '700', marginBottom: '15px' }}>
+                                    {clothes.name ? clothes.name : '로딩 중...'}
+                                </div>
                             </div>
                             <HeartButton
                                 onClick={toggleLike}
@@ -346,7 +359,9 @@ function Detail(props) {
                             </HeartButton>
                         </div>
 
-                        <p style={{ fontSize: '22px', fontWeight: '700' }}>{clothes.price ? `${clothes.price}원` : '가격 로딩 중...'}</p>
+                        <p style={{ fontSize: '22px', fontWeight: '700' }}>
+                            {clothes.price ? `${clothes.price.toLocaleString()}원` : '가격 로딩 중...'}
+                        </p>
 
                         <Dropdown onSelect={(eventKey) => {
                             const selectedDetail = details.find(detail => detail.detailId === parseInt(eventKey, 10));
@@ -385,7 +400,7 @@ function Detail(props) {
                                     </InputGroup>
                                 </div>
                                 <div style={{ fontSize: '22px', fontWeight: '700', textAlign: 'right', marginBottom: '15px' }}>
-                                    {clothes.price * quantity} 원
+                                    {(clothes.price * quantity).toLocaleString()} 원
                                 </div>
                             </div>
                         </Row>
@@ -418,10 +433,10 @@ function Detail(props) {
                     <Col>
                         <Nav variant="tabs" defaultActiveKey="link0" className="mt-3">
                             <Nav.Item>
-                                <Nav.Link style={{color: '#000000'}} eventKey="link0" onClick={() => { setTab(0) }}>상품 정보</Nav.Link>
+                                <Nav.Link style={{ color: '#000000' }} eventKey="link0" onClick={() => { setTab(0) }}>상품 정보</Nav.Link>
                             </Nav.Item>
                             <Nav.Item>
-                                <Nav.Link style={{color: '#000000'}} eventKey="link2" onClick={() => { setTab(1) }}>상품 리뷰</Nav.Link>
+                                <Nav.Link style={{ color: '#000000' }} eventKey="link2" onClick={() => { setTab(1) }}>상품 리뷰</Nav.Link>
                             </Nav.Item>
                         </Nav>
                         <TabContent tab={tab} imgUrls={imgUrls} clothesId={clothesId} />
@@ -519,7 +534,7 @@ function CommentsSection({ clothesId }) {
                         </FloatingLabel>
                     </Col>
                     <Col md={2} xs={12}>
-                        <button onClick={submitComment} className="btn btn-primary mt-2" style={{ fontSize: '16px', fontWeight: '700', width: '100%', height: '100%' }}>리뷰 작성 완료</button>
+                        <button onClick={submitComment} className="btn btn-primary mt-2" style={{ fontSize: '16px', fontWeight: '700', width: '100%', height: '100%', backgroundColor: '#000000' }}>리뷰 작성 완료</button>
                     </Col>
                 </Row>
                 <br></br>

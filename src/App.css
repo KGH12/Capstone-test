@@ -1,13 +1,9 @@
-/* .navbar-brand img {
-  content: url('./../public/img/Logo1.png');
-}
 
 @media (max-width: 768px) {
-  .navbar-brand img {
-    content: url('./../public/img/Logo3.png');
+  .recent-items {
+      display: none;
   }
-} */
-
+}
 
 @font-face {
   font-family: "Nanumsquare";

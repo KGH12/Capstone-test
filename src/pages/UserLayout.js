@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 import axios from 'axios';
 import { setCartItems } from '../store/cartSlice.js';
+import { FaHeart } from 'react-icons/fa6';
 
 
 
@@ -44,19 +45,6 @@ const BrandLogo = styled.img`
 function UserLayout(props) {
 
     const dispatch = useDispatch();
-
-    // // 최근 본 상품 초기화
-    // useEffect(() => {
-    //     let a = JSON.parse(localStorage.getItem('watched'))
-
-    //     if (a == null || a.length === 0) {
-    //         localStorage.setItem('watched', JSON.stringify([]))
-    //     }
-
-    // }, [])
-
-    // let recentItemId = JSON.parse(localStorage.getItem('watched'))
-
 
     let navigate = useNavigate();
 
@@ -117,8 +105,6 @@ function UserLayout(props) {
                         <Container>
 
                             <Navbar.Brand onClick={() => navigate('/')} style={{ fontSize: '24px', fontWeight: '700', color: '#1263CE', cursor: 'pointer' }}>
-                                {/* <img src={process.env.PUBLIC_URL + '/img/logo1.png'} style={{ height: '28px' }}></img> */}
-                                {/* <img className="navbar-brand-logo" alt="logo" style={{ maxHeight:'28px' }}></img> */}
                                 <BrandLogo logo={logo} alt="logo" />
                             </Navbar.Brand>
                             <Form className="search-form d-flex flex-grow-1" onSubmit={handleSearch}>
@@ -135,15 +121,17 @@ function UserLayout(props) {
                                 </Button>
                             </Form>
                             <Nav className="ms-auto">
-                                {/* <Nav.Link onClick={() => { navigate('/about') }}>회사정보</Nav.Link> */}
-                                {/* {isLoggedIn ? (
-                                    <Badge style={{ marginTop: '10px', marginBottom: '10px' }} bg="dark">{userInfo.email_id}님 환영합니다.</Badge>
-                            
-                                ) :
-                                    <Badge style={{ marginTop: '10px', marginBottom: '10px' }} bg="dark">로그인하세요!</Badge>
-                                    // <div>로그인하세요!</div>
+                                        <Nav.Link style={{ marginRight: '5px' }} onClick={() => {
+                                    if (isLoggedIn) {
+                                        navigate('/likespage')
+                                    } else {
+                                        alert('로그인 후 이용해주세요.');
+                                        navigate('/login');
+                                    }
+                                }}>
+                                    <FaHeart size={24} />
+                                </Nav.Link>
 
-                                } */}
 
                                 <Nav.Link style={{ marginRight: '5px' }} onClick={() => {
                                     if (isLoggedIn) {
@@ -153,7 +141,6 @@ function UserLayout(props) {
                                         navigate('/login');
                                     }
                                 }}>
-                                    {/* <FontAwesomeIcon icon={faCartShopping} /> */}
 
                                     <CartIconContainer>
                                         <FaShoppingCart size={24} />
@@ -178,30 +165,6 @@ function UserLayout(props) {
 
                         </Container>
                     </Navbar>
-
-                    {/* <Navbar bg="dark" data-bs-theme="dark">
-        <Container>
-          <Nav className="me-auto">
-            <Nav.Link onClick={() => { navigate('/itemlist') }}>여성</Nav.Link>
-            <Nav.Link onClick={() => { navigate('/itemlist') }}>남성</Nav.Link>
-            <Nav.Link onClick={() => { navigate('/itemlist') }}>키즈</Nav.Link>
-            <Nav.Link onClick={() => { navigate('/itemlist') }}>슈즈</Nav.Link>
-          </Nav>
-          <Nav className="ms-auto">
-            <Nav.Link onClick={() => { navigate('/login') }}>로그인</Nav.Link>
-            <Nav.Link onClick={() => { navigate('/join') }}>회원가입</Nav.Link>
-          </Nav>
-        </Container>
-      </Navbar>
-
-
-      <div style={{ color: 'gray', display: 'flex', alignItems: 'center', margin: '10px 130px' }}>
-        <Link to="/" style={{ color: 'gray', textDecoration: 'none', marginRight: '5px' }}>홈</Link>
-        <span>&gt;</span>
-        <Link to="/detail" style={{ color: 'gray', textDecoration: 'none', margin: '0 5px' }}>여성</Link>
-        <span>&gt;</span>
-        <Link to="/detail" style={{ color: 'gray', textDecoration: 'none', margin: '0 5px' }}>티셔츠</Link>
-      </div> */}
 
                     <Navbar bg="dark" data-bs-theme="dark" >
                         <Container>
@@ -238,25 +201,7 @@ function UserLayout(props) {
 
 
                     <Outlet></Outlet>
-      {/* <div className="col-md-3 recent-items">
-        <h5>최근 본 상품</h5>
-        {recentItemId && recentItemId.length > 0 ? (
-          <div>
-            {recentItemId.map(function (a, i) {
-              return (
-                <div key={i}>
-                  <img src={process.env.PUBLIC_URL + '/img/shoes' + (recentItemId[i] + 1) + '.jpg'} alt={`Shoe ${recentItemId[i] + 1}`} style={{ width: '100%', cursor: 'pointer' }}
-                    onClick={() => {
-                      navigate(`/detail/${recentItemId[i]}`)
-                    }} />
-                </div>
-              );
-            })}
-          </div>
-        ) : (
-          <p>최근 본 상품이 없습니다.</p>
-        )}
-      </div> */}
+                    <RecentItems></RecentItems>
                 </div>
                 <Navbar bg="light" data-bs-theme="light" style={{ width: '100%' }}>
                     <Container>
@@ -270,5 +215,47 @@ function UserLayout(props) {
         </div>
     )
 }
+
+function RecentItems() {
+    const [recentItems, setRecentItems] = useState([]);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const handleUpdate = () => {
+            let watchedItems = JSON.parse(sessionStorage.getItem('watched') || '[]');
+            // 최근 본 상품이 3개를 초과할 경우 가장 오래된 것부터 제거
+            if (watchedItems.length > 3) {
+                watchedItems = watchedItems.slice(-3); // 가장 최근 3개만 유지
+            }
+            setRecentItems(watchedItems);
+        };
+
+        window.addEventListener('recent-items-updated', handleUpdate);
+
+        // 초기 로드 시 항목 설정
+        handleUpdate();
+
+        return () => {
+            window.removeEventListener('recent-items-updated', handleUpdate);
+        };
+    }, []);
+
+    if (recentItems.length === 0) {
+        return <p></p>;
+    }
+
+    return (
+        <div className="col-md-3 recent-items">
+            <div style={{ whiteSpace: 'nowrap', marginBottom: '5px' }}>최근 본 상품</div>
+            {recentItems.map((item, index) => (
+                <div key={index}>
+                    <img src={item.imageUrl} alt={`상품 ${item.id}`} style={{ width: '100%', cursor: 'pointer' }}
+                        onClick={() => navigate(`/detail/${item.id}`)} />
+                </div>
+            ))}
+        </div>
+    );
+}
+
 
 export default UserLayout;
