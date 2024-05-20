@@ -53,14 +53,6 @@ const OrderManagement = () => {
             .catch(error => console.error('주문 데이터 가져오기 실패', error));
     };
 
-    // const handleStatusChange = (receiptDetailId, newStatus) => {
-    //     axios.put(`${process.env.REACT_APP_API_URL}/receipt_detail/${receiptDetailId}/${newStatus}`)
-    //         .then(() => {
-    //             alert('주문 상태가 성공적으로 변경되었습니다.');
-    //         })
-    //         .catch(error => console.error('주문 상태 변경 실패', error));
-    // };
-
     const handleStatusChange = (receiptDetailId, newStatus) => {
         axios.put(`${process.env.REACT_APP_API_URL}/receipt_detail/${receiptDetailId}/${newStatus}`)
             .then(() => {
