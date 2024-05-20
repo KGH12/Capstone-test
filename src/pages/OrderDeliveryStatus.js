@@ -61,7 +61,7 @@ function OrderDeliveryStatus(props) {
                 </Row>
                 <Row>
                     <Table striped bordered hover style={{ verticalAlign: 'middle' }}>
-                        <thead>
+                        <thead style={{ verticalAlign: 'middle' }}>
                             <tr>
                                 <th>#</th>
                                 <th style={{ whiteSpace: 'nowrap' }}>주문번호</th>

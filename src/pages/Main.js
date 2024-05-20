@@ -159,7 +159,7 @@ function RankingConTent({ tab, products }) {
                         <CardItem products={product} key={product.clothesId} alt={product.name} navigate={navigate}></CardItem>
                     ))
                 ) : (
-                    <p>No products available</p>
+                    <p>상품 불러오는 중..</p>
                 )}
             </Row>
         </Container>
