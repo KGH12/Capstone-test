@@ -53,14 +53,33 @@ const OrderManagement = () => {
             .catch(error => console.error('주문 데이터 가져오기 실패', error));
     };
 
+    // const handleStatusChange = (receiptDetailId, newStatus) => {
+    //     axios.put(`${process.env.REACT_APP_API_URL}/receipt_detail/${receiptDetailId}/${newStatus}`)
+    //         .then(() => {
+    //             alert('주문 상태가 성공적으로 변경되었습니다.');
+    //         })
+    //         .catch(error => console.error('주문 상태 변경 실패', error));
+    // };
+
     const handleStatusChange = (receiptDetailId, newStatus) => {
         axios.put(`${process.env.REACT_APP_API_URL}/receipt_detail/${receiptDetailId}/${newStatus}`)
             .then(() => {
                 alert('주문 상태가 성공적으로 변경되었습니다.');
+                // 상태가 변경된 후 sales 상태도 업데이트합니다.
+                const updatedSales = sales.map(sale => {
+                    if (sale.receiptDetailId === receiptDetailId) {
+                        return { ...sale, status: newStatus }; // 상태 변경
+                    }
+                    return sale;
+                });
+                setSales(updatedSales); // 업데이트된 sales 배열로 상태를 설정
             })
-            .catch(error => console.error('주문 상태 변경 실패', error));
+            .catch(error => {
+                console.error('주문 상태 변경 실패', error);
+            });
     };
 
+    
     const closeModal = () => {
         setShowModal(false);
     };

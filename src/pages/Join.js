@@ -350,7 +350,7 @@ function Join(props) {
                 </Form.Text>
               </Form.Group>
 
-              <Button onClick={onClickConfirmButton} disabled={notAllow} variant="primary" className='login-Button' style={{ marginBottom: '10px' }}>
+              <Button onClick={onClickConfirmButton} disabled={notAllow} variant="secondary" className='login-Button' style={{ marginBottom: '10px' }}>
                 가입하기
               </Button>
             </Form>
