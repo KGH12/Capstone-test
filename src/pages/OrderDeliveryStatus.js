@@ -10,7 +10,7 @@ function OrderDeliveryStatus(props) {
     let { userInfo, isLoggedIn, isLoading } = useSelector((state) => state.user);
     const [orders, setOrders] = useState([]);
 
-    // 주문 상태 코드를 문자열로 매핑
+    // 주문 상태 코드
     const statusLabels = {
         0: "상품 준비",
         1: "배송 준비",

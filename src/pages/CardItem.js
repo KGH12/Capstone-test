@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { Col, Card } from 'react-bootstrap';
 import './../App.css';
 import axios from 'axios'
+import { LazyLoadImage } from "react-lazy-load-image-component";
+import 'react-lazy-load-image-component/src/effects/blur.css'; // 필요한 CSS 효과
 
 function CardItem(props) {
   const [isHovered, setHovered] = useState(false);
@@ -35,8 +37,10 @@ function CardItem(props) {
   return (
     <Col xs={4} md={3} onClick={() => { props.navigate('/detail/' + props.products.clothesId) }}>
       <Card style={cardStyle} className="border-0" onMouseOver={() => setHovered(true)} onMouseOut={() => setHovered(false)}>
-        <Card.Img
+        <LazyLoadImage
+          alt={props.products.name} 
           src={imageUrl}
+          effect="blur" 
           style={{
             width: "100%",
             height: "200px",
@@ -57,7 +61,7 @@ function CardItem(props) {
             display: '-webkit-box',
             WebkitLineClamp: '2', // 2줄만 표시
             WebkitBoxOrient: 'vertical',
-            lineHeight: '20px', // 줄간격 설정
+            lineHeight: '20px',
           }}>
             {props.products.name}
           </Card.Title>
