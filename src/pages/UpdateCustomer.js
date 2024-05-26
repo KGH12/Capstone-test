@@ -317,7 +317,9 @@ function UpdateCustomer(props) {
                                     <Form.Control
                                         value={pw}
                                         onChange={handlePw}
-                                        type="password" placeholder="비밀번호를 입력하세요." className='login-Input' />
+                                        type="password" placeholder="비밀번호를 입력하세요." className='login-Input'
+                                        style={{ fontFamily: 'serif' }}
+                                        />
                                 </div>
                                 <Form.Text className="login-ErrorMessageWrap">
                                     {
@@ -334,7 +336,9 @@ function UpdateCustomer(props) {
                                     <Form.Control
                                         value={pwConfirm}
                                         onChange={handlePwConfirm}
-                                        type="password" placeholder="비밀번호를 입력하세요." className='login-Input' />
+                                        type="password" placeholder="비밀번호를 입력하세요." className='login-Input'
+                                        style={{ fontFamily: 'serif' }}
+                                        />
                                 </div>
                                 <Form.Text className="login-ErrorMessageWrap">
                                     {
